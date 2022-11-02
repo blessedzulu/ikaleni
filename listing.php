@@ -166,7 +166,7 @@
                         <p class='text-gray-500'>{$people_per_room} {$people_per_room_text} / room </p>
                       </div>
     
-                      <a href='#' class='btn btn btn-primary w-100' data-bs-toggle='modal' data-bs-target='#modal-scrollable'>
+                      <a href='#' class='btn btn-primary w-100' data-bs-toggle='modal' data-bs-target='#modal-scrollable'>
                         Book Now
                       </a>
                     </div>
@@ -205,11 +205,15 @@
         $boarding_house_id = $_GET['listing-id'];
         $result_booking = create_booking($user_id, $boarding_house_id);
 
-        header("Location: ./listing.php?listing-id={$_GET['listing-id']}&status=success");
-        ob_end_flush();
+        if ($result_booking) {
+          update_vacancies("decrease", $boarding_house_id);
+
+          header("Location: ./listing.php?listing-id={$_GET['listing-id']}&make-booking-status=success");
+          ob_end_flush();
+        }
       }
 
-      if (isset($_GET['status'])) {
+      if (isset($_GET['make-booking-status']) == "success") {
         echo
         "<div class='position-fixed end-0 top-0 mt-5 mx-3'>
           <div class='alert alert-success alert-dismissible me-3' role='alert'>
@@ -222,7 +226,7 @@
                 </svg>
               </div>
               <div>
-                <h4 class='alert-title'>Property listing successful</h4>
+                <h4 class='alert-title'>Booking successful</h4>
                 <div class='text-gray-500 fs-5'><a href='./student/index.php' class='link link-success'>View your bookings</a> on your dashboard</div>
               </div>
             </div>
@@ -234,8 +238,6 @@
       ?>
 
     </main>
-
-
 
     <!-- ! Footer -->
     <div class="footer">

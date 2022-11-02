@@ -5,6 +5,7 @@
   <?php
   $level = 2;
   include("../includes/head.php");
+  ob_start();
   ?>
   <title>Dashboard</title>
 </head>
@@ -27,7 +28,7 @@
             <!-- Section actions -->
             <div class="col-12 col-sm-auto ms-auto d-print-none">
               <div class="btn-list">
-                <a href="#" class="btn btn-primary">
+                <a href="../index.php" class="btn btn-primary">
                   <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
                     <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
                     <line x1="12" y1="5" x2="12" y2="19"></line>
@@ -55,14 +56,13 @@
                 </div>
               </div>
               ";
-              exit();
-            }
-            ?>
-
-            <div class="col-12">
-              <div class="card">
-                <div class="table mb-0">
-                  <table class="table table-mobile-xl card-table table-vcenter">
+              // exit();
+            } else {
+              echo "
+                <div class='col-12'>
+              <div class='card'>
+                <div class='table mb-0'>
+                  <table class='table table-mobile-xl card-table table-vcenter'>
                     <thead>
                       <tr>
                         <th>BH Name</th>
@@ -74,100 +74,155 @@
                       </tr>
                     </thead>
                     <tbody>
+              ";
+            }
 
-                      <?php
-                      while ($row_booking = mysqli_fetch_assoc($results_bookings)) {
-                        // Fetch and store tenant details
-                        $tenant_id = $row_booking['tenant_id'];
-                        $result_tenant = get_user_by_id($tenant_id);
-                        $row_tenant = mysqli_fetch_assoc($result_tenant);
-                        $tenant_first_name = $row_tenant['first_name'];
-                        $tenant_last_name = $row_tenant['last_name'];
+            while ($row_booking = mysqli_fetch_assoc($results_bookings)) {
+              // Fetch and store tenant details
+              $tenant_id = $row_booking['tenant_id'];
+              $result_tenant = get_user_by_id($tenant_id);
+              $row_tenant = mysqli_fetch_assoc($result_tenant);
+              $tenant_first_name = $row_tenant['first_name'];
+              $tenant_last_name = $row_tenant['last_name'];
 
-                        // Fetch and store boarding house details
-                        $listing_id = $row_booking['boarding_house_id'];
-                        $result_listing = get_listing($listing_id);
-                        $row_listing = mysqli_fetch_assoc($result_listing);
-                        $listing_name = $row_listing['name'];
-                        $listing_address = $row_listing['address'];
-                        $listing_township = $row_listing['township'];
+              // Fetch and store boarding house details
+              $listing_id = $row_booking['boarding_house_id'];
+              $result_listing = get_listing($listing_id);
+              $row_listing = mysqli_fetch_assoc($result_listing);
+              $listing_name = $row_listing['name'];
+              $listing_address = $row_listing['address'];
+              $listing_township = $row_listing['township'];
 
-                        // Fetch and store owner details
-                        $owner_id = $row_listing['owner_id'];
-                        $result_owner = get_user_by_id($owner_id);
-                        $row_owner = mysqli_fetch_assoc($result_owner);
+              // Fetch and store owner details
+              $owner_id = $row_listing['owner_id'];
+              $result_owner = get_user_by_id($owner_id);
+              $row_owner = mysqli_fetch_assoc($result_owner);
+              $owner_phone_number = $row_owner['phone_number'];
 
-                        // Booking Details
-                        $booking_id = $row_booking['id'];
-                        $booking_status = $row_booking['status'];
+              // Booking Details
+              $booking_id = $row_booking['id'];
+              $booking_status = $row_booking['status'];
 
-                        $booking_date_created = $row_booking['date_created'];
-                        $booking_date_day = date('j',  strtotime($booking_date_created));
-                        $booking_date_month = date('F',  strtotime($booking_date_created));
-                        $booking_date_year = date('Y',  strtotime($booking_date_created));
-                        $booking_date_formated = date('j F, Y',  strtotime($booking_date_created));
+              $booking_date_created = $row_booking['date_created'];
+              $booking_date_day = date('j',  strtotime($booking_date_created));
+              $booking_date_month = date('F',  strtotime($booking_date_created));
+              $booking_date_year = date('Y',  strtotime($booking_date_created));
+              $booking_date_formated = date('j F, Y',  strtotime($booking_date_created));
 
-                        $booking_due_date = $row_booking['date_approved'];
-                        $booking_due_date_day = date('j',  strtotime($booking_due_date));
-                        $booking_due_date_month = date('F',  strtotime($booking_due_date));
-                        $booking_due_date_year = date('Y',  strtotime($booking_due_date));
-                        $booking_due_date_formated = date('j F, Y',  strtotime($booking_due_date));
+              $booking_due_date = $row_booking['date_approved'];
+              $booking_due_date_day = date('j',  strtotime($booking_due_date));
+              $booking_due_date_month = date('F',  strtotime($booking_due_date));
+              $booking_due_date_year = date('Y',  strtotime($booking_due_date));
+              $booking_due_date_formated = date('j F, Y',  strtotime($booking_due_date));
 
-                        echo "
-                          <tr>
-                            <td data-label='BH Name'>{$listing_name}</td>
-                            <td data-label='BH Address'>{$listing_address}, {$listing_township}</td>
-                            <td data-label='Date Created'>{$booking_date_formated}</td>
-                            <td data-label='Rent Due'>-</td>
-                            <td class='text-warning' data-label='Status'>{$booking_status}</td>
-                            <td class='text-xl-end'>
-                              <span class='dropdown'>
-                                <button class='btn dropdown-toggle align-text-top d-inline-block' data-bs-toggle='dropdown'>Actions</button>
-                                <div class='dropdown-menu dropdown-menu-end'>
-                                  <a class='dropdown-item' href='#'>
-                                    Call Property Owner
-                                  </a>
-                                  <a class='dropdown-item' href='#'>
-                                    Cancel Booking
-                                  </a>
-                                </div>
-                              </span>
-                            </td>
-                          </tr>
-                        ";
-                      }
-                      ?>
+              echo "
+                <tr>
+                  <td data-label='BH Name'>{$listing_name}</td>
+                  <td data-label='BH Address'>{$listing_address}, {$listing_township}</td>
+                  <td data-label='Date Created'>{$booking_date_formated}</td>
+                  <td data-label='Rent Due'>-</td>
+                  <td class='text-warning' data-label='Status'>{$booking_status}</td>
+                  <td class='text-xl-end'>
+                    <span class='dropdown'>
+                      <button class='btn dropdown-toggle align-text-top d-inline-block' data-bs-toggle='dropdown'>Actions</button>
+                      <div class='dropdown-menu dropdown-menu-end'>
+                        <a class='dropdown-item' href='tel:+260{$owner_phone_number}'>
+                          Call Property Owner
+                        </a>
+                        <a class='dropdown-item text-danger' href='./?cancel-booking={$booking_id}'>
+                          Cancel Booking
+                        </a>
+                      </div>
+                    </span>
+                  </td>
+                </tr>
+              ";
+            }
+            ?>
 
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            </div>
+            </tbody>
+            </table>
           </div>
         </div>
-
       </div>
-      <footer class="footer footer-transparent d-print-none">
-        <div class="container">
-          <div class="row text-center align-items-center flex-row-reverse">
-            <div class="col-lg-auto ms-lg-auto">
-              <ul class="list-inline list-inline-dots mb-0">
-                <li class="list-inline-item"><a href="../index.php" class="link-secondary">Find Accommodation</a>
-                </li>
-              </ul>
-            </div>
-            <div class="col-12 col-lg-auto mt-3 mt-lg-0">
-              <ul class="list-inline list-inline-dots mb-0">
-                <li class="list-inline-item">
-                  © 2022 -
-                  <a href="." class="link-secondary">Ikaleni</a>
-                </li>
-              </ul>
-            </div>
+    </div>
+  </div>
+
+  </div>
+
+  <!-- Handle Booking Cancellations -->
+  <?php
+  if (isset($_GET['cancel-booking'])) {
+    $booking_id = $_GET['cancel-booking'];
+
+    // Fetch booking info
+    $result_booking = get_booking($booking_id);
+    $row_booking = mysqli_fetch_assoc($result_booking);
+    $tenant_id = $row_booking['tenant_id'];
+    $listing_id = $row_booking['boarding_house_id'];
+
+    // Fetch listing owner info
+    $result_listing = get_listing($listing_id);
+    $row_listing = mysqli_fetch_assoc($result_listing);
+    $owner_id = $row_listing['owner_id'];
+
+    if (($_SESSION['user_id'] == $tenant_id) || ($_SESSION['user_id'] == $owner_id)) {
+      $result_delete_booking = delete_booking($booking_id);
+
+      if (!empty($result_delete_booking)) {
+        $result_update_vacancies = update_vacancies("increase", $listing_id);
+        header('Location: ./?cancel-booking-status=success');
+        ob_end_flush();
+      }
+    };
+  }
+
+  if (isset($_GET['cancel-booking-status']) == "success") {
+    echo
+    "<div class='position-fixed end-0 top-0 mt-5 mx-3'>
+      <div class='alert alert-success alert-dismissible me-3' role='alert'>
+        <div class='d-flex'>
+          <div>
+            <svg xmlns='http://www.w3.org/2000/svg' class='icon alert-icon' width='24' height='24' viewBox='0 0 24 24'
+              stroke-width='2' stroke='currentColor' fill='none' stroke-linecap='round' stroke-linejoin='round'>
+              <path stroke='none' d='M0 0h24v24H0z' fill='none'></path>
+              <path d='M5 12l5 5l10 -10'></path>
+            </svg>
+          </div>
+          <div>
+            <h4 class='alert-title'>Booking cancelled successfully</h4>
+            <div class='text-gray-500 fs-5'><a href='./student/index.php' class='link link-success'>Make a new booking</a></div>
           </div>
         </div>
-      </footer>
+        <a class='btn-close' data-bs-dismiss='alert' aria-label='close'></a>
+      </div>
+    </div>";
+  }
+  ?>
+
+
+
+  <footer class="footer footer-transparent d-print-none">
+    <div class="container">
+      <div class="row text-center align-items-center flex-row-reverse">
+        <div class="col-lg-auto ms-lg-auto">
+          <ul class="list-inline list-inline-dots mb-0">
+            <li class="list-inline-item"><a href="../index.php" class="link-secondary">Find Accommodation</a>
+            </li>
+          </ul>
+        </div>
+        <div class="col-12 col-lg-auto mt-3 mt-lg-0">
+          <ul class="list-inline list-inline-dots mb-0">
+            <li class="list-inline-item">
+              © 2022 -
+              <a href="." class="link-secondary">Ikaleni</a>
+            </li>
+          </ul>
+        </div>
+      </div>
     </div>
+  </footer>
+  </div>
   </div>
 
 </body>

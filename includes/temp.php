@@ -69,3 +69,6 @@
 
   </div>
 </div>
+
+<!-- My Properties Property Owner Dropdown Item -->
+<!-- <a href='{$url_prefix}{$_SESSION['account_type']}/my-properties.php' class='dropdown-item'>My Properties</a> -->

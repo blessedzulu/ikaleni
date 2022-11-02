@@ -112,6 +112,20 @@ function search_listings($township, $gender, $min_price, $max_price) {
   return query_db($conn, $query);
 }
 
+function update_vacancies($operation, $boarding_house_id) {
+  $conn = connect();
+
+  if ($operation == "decrease") {
+    $query = "UPDATE listings SET vacancies = vacancies - 1 WHERE vacancies > 0 AND id = $boarding_house_id";
+    return query_db($conn, $query);
+  }
+
+  if ($operation == "increase") {
+    $query = "UPDATE listings SET vacancies = vacancies + 1 WHERE vacancies <= capacity AND id = $boarding_house_id";
+    return query_db($conn, $query);
+  }
+};
+
 function create_booking($tenant_id, $boarding_house_id) {
   $conn = connect();
   $query = "INSERT INTO bookings(tenant_id, boarding_house_id, date_created, date_approved, status)";
@@ -122,6 +136,12 @@ function create_booking($tenant_id, $boarding_house_id) {
 function get_all_bookings() {
   $conn = connect();
   $query = "SELECT * FROM bookings";
+  return query_db($conn, $query);
+}
+
+function get_booking($booking_id) {
+  $conn = connect();
+  $query = "SELECT * FROM bookings WHERE id = $booking_id";
   return query_db($conn, $query);
 }
 
@@ -137,6 +157,13 @@ function get_user_bookings($user_id) {
   return query_db($conn, $query);
 }
 
+function delete_booking($booking_id) {
+  $conn = connect();
+  $query = "DELETE FROM bookings WHERE id = '$booking_id'";
+  return query_db($conn, $query);
+}
+
+// ? Helper Functions
 function hyphenate_string($string) {
   $string = strtolower($string);
   $string = trim($string);

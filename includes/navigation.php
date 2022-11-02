@@ -50,7 +50,6 @@ if (isset($_SESSION['email'])) {
               <a href='{$url_prefix}{$_SESSION['account_type']}/index.php' class='dropdown-item'>Dashboard</a>
               <div class='dropdown-divider'></div>
               <span class='dropdown-item text-uppercase small text-gray-500 fs-6'>Properties</span>
-              <a href='{$url_prefix}{$_SESSION['account_type']}/my-properties.php' class='dropdown-item'>My Properties</a>
               <a href='{$url_prefix}{$_SESSION['account_type']}/create-listing.php' class='dropdown-item'>List a Property</a>
               <div class='dropdown-divider'></div>
               <span class='dropdown-item text-uppercase small text-gray-500 fs-6'>Account</span>

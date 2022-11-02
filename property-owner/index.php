@@ -27,7 +27,7 @@
             <!-- Section actions -->
             <div class="col-12 col-sm-auto ms-auto d-print-none">
               <div class="btn-list">
-                <a href="./my-properties.php" class="btn btn-outline-primary">View All</a>
+                <!-- <a href="./my-properties.php" class="btn btn-outline-primary">View All</a> -->
                 <a href="./create-listing.php" class="btn btn-primary">
                   <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
                     <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
@@ -90,8 +90,14 @@
     
                         </p>
                         <div class='d-flex flex-column flex-sm-row gap-2'>
-                          <a href='./edit-listing.php' class='btn btn-outline-primary w-33'>Edit</a>
-                          <a href='./view-bookings.php?listing-id={$id}' class='btn btn-primary w-66'>View Bookings</a>
+                        <a href='./view-bookings.php?listing-id={$id}' class='btn btn-primary w-66'>View Bookings</a>
+                        <span class='dropdown'>
+                          <button class='btn dropdown-toggle align-text-top d-inline-block' data-bs-toggle='dropdown'>Actions</button>
+                          <div class='dropdown-menu dropdown-menu-end'>
+                            <a href='./edit-listing.php?listing-id=${id}' class='dropdown-item'>Edit Listing</a>
+                            <a href='./?delete-listing=${id}' class='dropdown-item text-danger'>Delete Listing</a>
+                          </div>
+                        </span>
                         </div>
                       </div>
                     </div>
@@ -105,6 +111,7 @@
         </div>
 
       </div>
+
       <footer class="footer footer-transparent d-print-none">
         <div class="container">
           <div class="row text-center align-items-center flex-row-reverse">
