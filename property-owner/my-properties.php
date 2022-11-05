@@ -5,6 +5,7 @@
   <?php
   $level = 2;
   include("../includes/head.php");
+  check_page_access('property-owner');
   ?>
   <title>My Properties</title>
 </head>

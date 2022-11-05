@@ -5,6 +5,7 @@
   <?php
   $level = 2;
   include("../includes/head.php");
+  check_page_access('property-owner');
   ?>
   <title>Dashboard</title>
 </head>
@@ -94,6 +95,7 @@
                         <span class='dropdown'>
                           <button class='btn dropdown-toggle align-text-top d-inline-block' data-bs-toggle='dropdown'>Actions</button>
                           <div class='dropdown-menu dropdown-menu-end'>
+                          <a href='../listing.php?listing-id=${id}' class='dropdown-item'>View Listing</a>
                             <a href='./edit-listing.php?listing-id=${id}' class='dropdown-item'>Edit Listing</a>
                             <a href='./?delete-listing=${id}' class='dropdown-item text-danger'>Delete Listing</a>
                           </div>

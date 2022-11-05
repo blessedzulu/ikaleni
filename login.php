@@ -18,6 +18,13 @@
     <div class="container-tight py-4 mt-4">
       <!-- Form Handler -->
       <?php
+
+      $location = '';
+
+      if (isset($_GET['location'])) {
+        $location = $_GET['location'];
+      }
+
       if (isset($_GET['log-in'])) {
         if (isset($_GET['email']) && isset($_GET['password'])) {
           $conn = connect();
@@ -40,7 +47,7 @@
             }
 
             if ($password_correct = password_verify($password, $hash)) {
-              authenticate($user_id, $account_type, $first_name, $last_name, $email, $phone_number);
+              authenticate($user_id, $account_type, $first_name, $last_name, $email, $phone_number, $location);
             };
           }
         }
@@ -50,6 +57,8 @@
       <form class="card card-md" action="./login.php" method="get">
         <div class="card-body">
           <h2 class="h5 text-center mb-4">Login to your account</h2>
+          <h2 class="h5 text-center mb-4"><?= $location ?></h2>
+          <h2 class="h5 text-center mb-4"><?= !empty($location) ?></h2>
           <div class="mb-3">
             <label class="form-label required">Email</label>
             <input type="email" class="form-control" placeholder="Enter email" name="email" required>
@@ -88,25 +97,15 @@
 
   <?php
   if (isset($_GET['log-in']) && empty($password_correct)) {
-    echo
-    "<div class='position-fixed end-0 top-0 mt-5 mx-3'>
-      <div class='alert alert-danger alert-dismissible me-3' role='alert'>
-          <div class='d-flex'>
-            <div>
-              <svg xmlns='http://www.w3.org/2000/svg' class='icon alert-icon' width='24' height='24' viewBox='0 0 24 24'
-                stroke-width='2' stroke='currentColor' fill='none' stroke-linecap='round' stroke-linejoin='round'>
-                <path stroke='none' d='M0 0h24v24H0z' fill='none'></path>
-                <path d='M5 12l5 5l10 -10'></path>
-              </svg>
-            </div>
-            <div>
-              <h4 class='alert-title'>Wrong login details</h4>
-              <div class='text-danger fs-5'>Try to login again</div>
-            </div>
-          </div>
-          <a class='btn-close' data-bs-dismiss='alert' aria-label='close'></a>
-        </div>
-    </div>";
+    render_alert('danger', 'Incorrect login details', 'Please try again');
+  }
+
+  if (isset($_GET['checkpoint']) && $_GET['checkpoint'] == 'no-access') {
+    render_alert('warning', 'Page inaccessible', 'You do not have permission to access that page.');
+  }
+
+  if (isset($_GET['checkpoint']) && $_GET['checkpoint'] == 'not-logged-in' && !isset($_SESSION['user_id'])) {
+    render_alert('warning', 'You are not logged in', 'Log in or sign up for an account to continue.');
   }
   ?>
 </body>
