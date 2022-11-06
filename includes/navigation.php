@@ -85,7 +85,9 @@ if (isset($_SESSION['email'])) {
       </div>
     ";
   }
-} else {
+}
+
+if (!isset($_SESSION['email'])) {
   echo "
     <div class='container'>
       <button class='navbar-toggler order-1' type='button' data-bs-toggle='collapse' data-bs-target='#navbar-menu'>
@@ -107,5 +109,5 @@ if (isset($_SESSION['email'])) {
         </div>
       </div>
     </div>
-    ";
+  ";
 }

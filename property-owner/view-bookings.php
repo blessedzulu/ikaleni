@@ -90,11 +90,11 @@
                     <table class='table table-mobile-xl card-table table-vcenter'>
                       <thead>
                         <tr>
-                          <th>#</th>
+                          <th class='d-none d-xl-table-cell'>#</th>
                           <th></th>
                           <th>Tenant Name</th>
                           <th>Date Created</th>
-                          <th>Rent Due Date</th>
+                          <th>Date Approved</th>
                           <th>Status</th>
                           <th></th>
                         </tr>
@@ -147,7 +147,7 @@
                 if (strtolower($booking_status) == 'pending') {
                   echo "
                     <tr>
-                      <td data-label='#'>{$iteration_count}</td>
+                      <td data-label='#' class='d-none d-xl-table-cell text-gray-300'>{$iteration_count}</td>
                       <td>
                         <span class='avatar avatar-md rounded-circle' style='background-image: src();'>{$tenant_initials}</span>
                       </td>
@@ -159,8 +159,8 @@
                         <span class='dropdown'>
                           <button class='btn dropdown-toggle align-text-top d-inline-block' data-bs-toggle='dropdown'>Actions</button>
                           <div class='dropdown-menu dropdown-menu-end'>
-                            <a class='dropdown-item text-success' href='?listing-id={$listing_id}&approve-booking={$booking_id}'>Approve booking</a>
-                            <a class='dropdown-item text-danger' href='?listing-id={$listing_id}&decline-booking={$booking_id}'>Decline booking</a>
+                            <a class='dropdown-item text-success' onclick='return confirm(\"Are you sure you want to approve this booking?\")' href='?listing-id={$listing_id}&approve-booking={$booking_id}'>Approve booking</a>
+                            <a class='dropdown-item text-danger' onclick='return confirm(\"Are you sure you want to decline this booking?\")' href='?listing-id={$listing_id}&decline-booking={$booking_id}'>Decline booking</a>
                             <a class='dropdown-item' href='tel:260{$owner_phone_number}'>Contact tenant</a>
                           </div>
                         </span>
@@ -172,7 +172,7 @@
                 if (strtolower($booking_status) == 'approved') {
                   echo "
                     <tr>
-                      <td data-label='#'>{$iteration_count}</td>
+                      <td data-label='#' class='d-none d-xl-table-cell text-gray-300'>{$iteration_count}</td>
                       <td>
                         <span class='avatar avatar-md rounded-circle' style='background-image: src();'>{$tenant_initials}</span>
                       </td>
@@ -184,7 +184,7 @@
                         <span class='dropdown'>
                           <button class='btn dropdown-toggle align-text-top d-inline-block' data-bs-toggle='dropdown'>Actions</button>
                           <div class='dropdown-menu dropdown-menu-end'>
-                            <a class='dropdown-item text-danger' href='?listing-id={$listing_id}&cancel-booking={$booking_id}'>Cancel booking</a>
+                            <a class='dropdown-item text-danger' onclick='return confirm(\"Are you sure you want to cancel this booking?\")' href='?listing-id={$listing_id}&cancel-booking={$booking_id}'>Cancel booking</a>
                             <a class='dropdown-item' href='tel:260{$owner_phone_number}'>Contact tenant</a>
                           </div>
                         </span>

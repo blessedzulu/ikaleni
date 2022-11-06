@@ -1,3 +1,5 @@
+<?php ob_start() ?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -55,8 +57,9 @@
                 </div>
               </div>
               ";
-              exit();
-            } else {
+            }
+
+            if ($count > 0) {
               while ($row = mysqli_fetch_assoc($get_listings_results)) {
 
                 // $address, $township, $gender, $price, $capacity, $people_per_room, $description, $rules, $cover_image, $features_str
@@ -70,7 +73,7 @@
                 $cover_image = $row['image'];
 
                 echo "
-                <div class='col col-12 col-lg-6 col-xl-3 mb-3'>
+                <div class='col col-12 col-sm-6 col-xl-3 mb-3'>
                   <div class='card card-sm bg-white shadow hover-shadow'>
     
                     <div class='ratio ratio-16x9'>
@@ -87,17 +90,17 @@
                             <path d='M17.657 16.657l-4.243 4.243a2 2 0 0 1 -2.827 0l-4.244 -4.243a8 8 0 1 1 11.314 0z'>
                             </path>
                           </svg>
-                          <span class='me-1'>{$address},</span><span>{$township}</span>
-    
+                          <span>{$address}, {$township}</span>
+
                         </p>
-                        <div class='d-flex flex-column flex-sm-row gap-2'>
-                        <a href='./view-bookings.php?listing-id={$id}' class='btn btn-primary w-66'>View Bookings</a>
-                        <span class='dropdown'>
+                        <div class='d-flex gap-2 flex-wrap flex-lg-nowrap'>
+                        <a href='./view-bookings.php?listing-id={$id}' class='btn btn-primary'>View Bookings</a>
+                        <span class='dropdown d-inline-block'>
                           <button class='btn dropdown-toggle align-text-top d-inline-block' data-bs-toggle='dropdown'>Actions</button>
                           <div class='dropdown-menu dropdown-menu-end'>
                           <a href='../listing.php?listing-id=${id}' class='dropdown-item'>View Listing</a>
                             <a href='./edit-listing.php?listing-id=${id}' class='dropdown-item'>Edit Listing</a>
-                            <a href='./?delete-listing=${id}' class='dropdown-item text-danger'>Delete Listing</a>
+                            <a href='./?delete-listing=${id}' onclick='return confirm(\"Are you sure you want to delete this listing?\")' class='dropdown-item text-danger'>Delete Listing</a>
                           </div>
                         </span>
                         </div>
@@ -113,6 +116,27 @@
         </div>
 
       </div>
+
+      <?php
+      // ? Handle listing deletions
+      if (isset($_GET['delete-listing'])) {
+        $listing_id = $_GET['delete-listing'];
+
+        // ? Fetch listing owner info
+        $result_listing = get_listing($listing_id);
+        $row_listing = mysqli_fetch_assoc($result_listing);
+        $owner_id = $row_listing['owner_id'];
+
+        if (($_SESSION['user_id'] == $owner_id)) {
+          $result_delete_listing = delete_listing($listing_id);
+          header('Location: ./?delete-listing-status=success');
+        }
+      }
+
+      if (isset($_GET['delete-listing-status']) == "success") {
+        render_alert('success', 'Listing declined', 'Listing deleted successfully.');
+      }
+      ?>
 
       <footer class="footer footer-transparent d-print-none">
         <div class="container">

@@ -20,31 +20,71 @@
 
       <!-- Form Handler -->
       <?php
+      // Variables
+      $listing_id;
+      $bookings;
+      $capacity;
+      $vacancies;
 
-      if (isset($_POST['submit-listing'])) {
+
+      if (!isset($_GET['listing-id'])) {
+        header('Location: ./index.php');
+        ob_end_flush();
+      }
+
+      if (isset($_GET['listing-id'])) {
+        $listing_id = $_GET['listing-id'];
+
+        // ? Get listing details
+        $result_listing = get_listing($listing_id);
+        $row_listing = mysqli_fetch_assoc($result_listing);
+        $count = mysqli_num_rows($result_listing);
+        $owner_id = $row_listing['owner_id'];
+
+        // ? Redirect if listing doest not exist
+        if ($count == 0 || $_SESSION['user_id'] != $owner_id) {
+          header('Location: ./index.php');
+          ob_end_flush();
+        }
+
+        $name = $row_listing['name'];
+        $address = $row_listing['address'];
+        $township = $row_listing['township'];
+        $gender = $row_listing['gender'];
+        $price = $row_listing['price_per_month'];
+        $capacity = $row_listing['capacity'];
+        $vacancies = $row_listing['vacancies'];
+        $people_per_room = $row_listing['people_per_room'];
+        $description = $row_listing['description'];
+        $rules = $row_listing['rules'];
+        $bookings = $capacity - $vacancies;
+      }
+
+      // ? Update listing
+      if (isset($_POST['update-listing'])) {
         $conn = connect();
 
+        // Basic Attributes
+        $new_name = mysqli_real_escape_string($conn, $_POST['name']);
+        $new_address = mysqli_real_escape_string($conn, $_POST['address']);
+        $new_township = mysqli_real_escape_string($conn, $_POST['township']);
+        $new_gender = mysqli_real_escape_string($conn, $_POST['gender']);
+        $new_price = mysqli_real_escape_string($conn, $_POST['price']);
+        $new_capacity = mysqli_real_escape_string($conn, $_POST['capacity']);
+        $new_people_per_room = mysqli_real_escape_string($conn, $_POST['people-per-room']);
+        $new_description = mysqli_real_escape_string($conn, $_POST['description']);
+        $new_rules = mysqli_real_escape_string($conn, $_POST['rules']);
+
+        // Cover Image
+        $new_cover_image = $_FILES["cover-image"]["name"];
+        $new_cover_image_temp = $_FILES["cover-image"]["tmp_name"];
+
+        move_uploaded_file($new_cover_image_temp, "../assets/img/listings/{$new_cover_image}");
+
+        // ? Handle features
         $features_str = '';
         $features_arr = [];
 
-        // Basic Attributes
-        $name = mysqli_real_escape_string($conn, $_POST['name']);
-        $address = mysqli_real_escape_string($conn, $_POST['address']);
-        $township = mysqli_real_escape_string($conn, $_POST['township']);
-        $gender = mysqli_real_escape_string($conn, $_POST['gender']);
-        $price = mysqli_real_escape_string($conn, $_POST['price']);
-        $capacity = mysqli_real_escape_string($conn, $_POST['capacity']);
-        $people_per_room = mysqli_real_escape_string($conn, $_POST['people-per-room']);
-        $description = mysqli_real_escape_string($conn, $_POST['description']);
-        $rules = mysqli_real_escape_string($conn, $_POST['rules']);
-
-        // Cover Image
-        $cover_image = $_FILES["cover-image"]["name"];
-        $cover_image_temp = $_FILES["cover-image"]["tmp_name"];
-
-        move_uploaded_file($cover_image_temp, "../assets/img/listings/{$cover_image}");
-
-        // Features
         $result_features = get_all_features();
         $row = mysqli_fetch_assoc($result_features);
         $features = $row['features'];
@@ -58,22 +98,34 @@
 
         $features_str = implode(',', $features_arr);
 
-        // Add Listing to Database
-        $result = create_listing($_SESSION['user_id'], $name, $address, $township, $gender, $price, $capacity, $people_per_room, $description, $rules, $cover_image, $features_str);
+        // ? Checks
+        // Update vacancies
+        $new_vacancies = $new_capacity - $bookings;
+
+        if ($new_capacity - $bookings < 0) {
+          render_alert('danger', 'Listing update failed', 'The new capacity should not be less than the </br> number of active bookings (' . $bookings . ').');
+        } else {
+          // ? Update listing
+          $result_update_booking = update_listing($listing_id, $new_name, $new_address, $new_township, $new_gender, $new_price, $new_capacity, $new_vacancies, $new_people_per_room, $new_description, $new_rules, $new_cover_image, $features_str);
+
+          if (!empty($result_update_booking)) {
+            render_alert('success', 'Property updated successfully', 'View your updated listing on ', './index.php', 'your dashboard.');
+          }
+        }
       }
       ?>
 
-      <form class="card card-md bg-white" action="./create-listing.php" method="post" enctype="multipart/form-data">
+      <form class="card card-md bg-white" action="" method="post" enctype="multipart/form-data">
         <div class="card-body">
-          <h2 class="h5 text-center mb-4">Update Listing</h2>
+          <h2 class="h5 text-center mb-4">Update Your Property Listing</h2>
 
           <div class="mb-3">
             <label class="form-label required">Boarding House Name</label>
-            <input type="text" class="form-control" placeholder="ZUCT Boarding House" name="name" required>
+            <input type="text" class="form-control" value="<?= $name ?>" name="name" placeholder="ZUCT Boarding House" required>
           </div>
           <div class="mb-3">
             <div class="form-label">Boarding House Cover Image</div>
-            <input type="file" name="cover-image" class="form-control">
+            <input type="file" name="cover-image" class="form-control" required>
           </div>
           <div class="mb-3">
             <label class="form-label required">Township</label>
@@ -84,7 +136,7 @@
           </div>
           <div class="mb-3">
             <label class="form-label required">Address</label>
-            <input type="text" class="form-control" placeholder="5 James Phiri Road" name="address" required>
+            <input type="text" class="form-control" value="<?= $address ?>" name="address" placeholder="5 James Phiri Road" required>
           </div>
           <div class="mb-3">
             <label class="form-label required">Target Gender</label>
@@ -98,20 +150,20 @@
             <label class="form-label required">Price per Month</label>
             <div class="input-group mb-2">
               <span class="input-group-text">ZMK</span>
-              <input type="number" min="0" class="form-control" placeholder="500" name="price" required>
+              <input type="number" min="0" class="form-control" value="<?= $price ?>" name="price" placeholder="500" required>
             </div>
           </div>
           <div class="mb-3">
             <label class="form-label required">Boarding House Capacity</label>
-            <input type="number" class="form-control" placeholder="50" name="capacity" required>
+            <input type="number" class="form-control" value="<?= $capacity ?>" name="capacity" placeholder="50" required>
           </div>
           <div class="mb-3">
             <label class="form-label required">People per Room</label>
-            <input type="number" class="form-control" placeholder="2" name="people-per-room" required>
+            <input type="number" class="form-control" value="<?= $people_per_room ?>" name="people-per-room" placeholder="2" required>
           </div>
           <div class="mb-3">
             <label class="form-label" for="description">Boarding House Description</label>
-            <textarea id="description" rows="5" name="description" class=" form-control" required placeholder="Information about the boarding house, its unique selling points, room options, and why students would want to stay here"></textarea>
+            <textarea id="description" rows="5" name="description" class=" form-control" required placeholder="Information about the boarding house, its unique selling points, the rooms, and why students would want to stay here"><?= $description ?></textarea>
           </div>
 
           <div class="mb-3">
@@ -142,10 +194,10 @@
 
           <div class="mb-3">
             <label class="form-label">Boarding House Rules</label>
-            <textarea rows="5" name="rules" class="form-control" placeholder="Information about curfew, guests and other rules that tenants should observe" required></textarea>
+            <textarea rows="5" name="rules" class="form-control" placeholder="Information about curfew, guests and other rules that tenants should observe" required><?= $rules ?></textarea>
           </div>
           <div class="form-footer">
-            <button type="submit" name="submit-listing" class="btn btn-primary w-100">Submit Your Listing</button>
+            <button type="submit" name="update-listing" class="btn btn-primary w-100">Update Listing</button>
           </div>
         </div>
       </form>
@@ -153,29 +205,6 @@
     </div>
   </div>
 
-  <?php
-  if (isset($_POST['submit-listing']) && $result) {
-    echo
-    "<div class='position-fixed end-0 top-0 mt-5 mx-3'>
-      <div class='alert alert-success alert-dismissible me-3' role='alert'>
-          <div class='d-flex'>
-            <div>
-              <svg xmlns='http://www.w3.org/2000/svg' class='icon alert-icon' width='24' height='24' viewBox='0 0 24 24'
-                stroke-width='2' stroke='currentColor' fill='none' stroke-linecap='round' stroke-linejoin='round'>
-                <path stroke='none' d='M0 0h24v24H0z' fill='none'></path>
-                <path d='M5 12l5 5l10 -10'></path>
-              </svg>
-            </div>
-            <div>
-              <h4 class='alert-title'>Property listing successful</h4>
-              <div class='text-gray-500 fs-5'><a href='./index.php' class='link link-success'>View all your listigs</a> on your dashboard</div>
-            </div>
-          </div>
-          <a class='btn-close' data-bs-dismiss='alert' aria-label='close'></a>
-        </div>
-    </div>";
-  }
-  ?>
 </body>
 
 </html>

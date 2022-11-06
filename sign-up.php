@@ -1,3 +1,5 @@
+<?php ob_start() ?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -22,6 +24,7 @@
       if (isset($_POST['sign-up'])) {
         $conn = connect();
 
+        // ? Read user details
         $account_type = $_POST['account-type'];
         $first_name = mysqli_real_escape_string($conn, $_POST['first-name']);
         $last_name = mysqli_real_escape_string($conn, $_POST['last-name']);
@@ -29,10 +32,22 @@
         $password = mysqli_real_escape_string($conn, $_POST['password']);
         $phone_number = mysqli_real_escape_string($conn, $_POST['phone-number']);
 
-        // Process password
-        $hash = password_hash($password, PASSWORD_DEFAULT);
+        // ? Check if email is already in use
+        $result_by_email = get_user_by_email($email);
 
-        $result = create_user($account_type, $first_name, $last_name, $email, $hash, $phone_number);
+        if (mysqli_num_rows($result_by_email) > 0) {
+          render_alert('danger', 'Sign up failed', 'Email already in use. ', './login.php', 'Log in here.');
+        }
+
+        if (mysqli_num_rows($result_by_email) == 0) {
+          // ? Process password
+          $hash = password_hash($password, PASSWORD_DEFAULT);
+
+          // ? Create user
+          $result_create_account = create_user($account_type, $first_name, $last_name, $email, $hash, $phone_number);
+          header('Location: ./login.php?referrer=new-account');
+          ob_end_flush();
+        }
       }
       ?>
 
@@ -101,30 +116,6 @@
   <div class="footer">
     <?php include("./includes/footer.php") ?>
   </div>
-
-  <?php
-  if (isset($_POST['sign-up']) && $result) {
-    echo
-    "<div class='position-fixed end-0 top-0 mt-5 mx-3'>
-      <div class='alert alert-success alert-dismissible me-3' role='alert'>
-          <div class='d-flex'>
-            <div>
-              <svg xmlns='http://www.w3.org/2000/svg' class='icon alert-icon' width='24' height='24' viewBox='0 0 24 24'
-                stroke-width='2' stroke='currentColor' fill='none' stroke-linecap='round' stroke-linejoin='round'>
-                <path stroke='none' d='M0 0h24v24H0z' fill='none'></path>
-                <path d='M5 12l5 5l10 -10'></path>
-              </svg>
-            </div>
-            <div>
-              <h4 class='alert-title'>Account creation successful</h4>
-              <div class='text-gray-500 fs-5'><a href='./login.php' class='link link-success'>Log in</a> into your new account</div>
-            </div>
-          </div>
-          <a class='btn-close' data-bs-dismiss='alert' aria-label='close'></a>
-        </div>
-    </div>";
-  }
-  ?>
 </body>
 
 </html>

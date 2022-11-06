@@ -67,7 +67,7 @@
                       <table class='table table-mobile-xl card-table table-vcenter'>
                         <thead>
                           <tr>
-                            <th>#</th>
+                            <th d-none d-xl-table-cell>#</th>
                             <th></th>
                             <th>Student Name</th>
                             <th>Boarding House Name</th>
@@ -122,7 +122,7 @@
 
                 echo "
                 <tr>
-                  <td data-label='#' class='text-gray-300'>{$iteration_count}</td>
+                  <td data-label='#' class='text-gray-300 d-none d-xl-table-cell'>{$iteration_count}</td>
                   <td>
                     <span class='avatar avatar-md rounded-circle' style='background-image: src();'>{$tenant_initials}</span>
                   </td>

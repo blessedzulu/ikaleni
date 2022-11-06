@@ -50,7 +50,7 @@ function get_all_users() {
   return query_db($conn, $query);
 }
 
-function authenticate($user_id, $account_type, $first_name, $last_name, $email, $phone_number, $location) {
+function authenticate($user_id, $account_type, $first_name, $last_name, $email, $phone_number) {
   ob_start();
   session_start();
 
@@ -60,13 +60,6 @@ function authenticate($user_id, $account_type, $first_name, $last_name, $email, 
   $_SESSION['last_name'] = $last_name;
   $_SESSION['phone_number'] = $phone_number;
   $_SESSION['email'] = $email;
-
-  if (!empty($location)) {
-    header('Location: ' . $location);
-    exit;
-  }
-
-
 
   if ($account_type == 'student') {
     header('Location: student/index.php');
@@ -92,6 +85,14 @@ function create_listing($owner_id, $name, $address, $township, $gender, $price_p
 
   $query = "INSERT INTO listings(owner_id, name, address, township, gender, price_per_month, capacity, vacancies, people_per_room, description, rules, image, features)";
   $query .= " VALUES($owner_id, '$name', '$address', '$township', '$gender', $price_per_month, $capacity, $capacity, $people_per_room, '$description', '$rules', '$cover_image', '$features');";
+
+  return query_db($conn, $query);
+}
+
+function update_listing($listing_id, $name, $address, $township, $gender, $price_per_month, $capacity, $vacancies, $people_per_room, $description, $rules, $cover_image, $features) {
+  $conn = connect();
+
+  $query = "UPDATE listings SET name = '$name', address = '$address', township = '$township', gender = '$gender', price_per_month = $price_per_month, capacity = $capacity, vacancies = $vacancies, people_per_room = $people_per_room, description = '$description', rules = '$rules', image = '$cover_image', features = '$features' WHERE id = $listing_id";
 
   return query_db($conn, $query);
 }
@@ -129,6 +130,12 @@ function update_vacancies($operation, $boarding_house_id) {
     return query_db($conn, $query);
   }
 };
+
+function delete_listing($listing_id) {
+  $conn = connect();
+  $query = "DELETE FROM listings WHERE id = $listing_id";
+  return query_db($conn, $query);
+}
 
 function create_booking($tenant_id, $boarding_house_id) {
   $conn = connect();
@@ -175,7 +182,7 @@ function get_user_bookings_at_listing($user_id, $listing_id) {
 
 function delete_booking($booking_id) {
   $conn = connect();
-  $query = "DELETE FROM bookings WHERE id = '$booking_id'";
+  $query = "DELETE FROM bookings WHERE id = $booking_id";
   return query_db($conn, $query);
 }
 
@@ -203,7 +210,7 @@ function check_page_access($account_type) {
 // ? UI Rendering Functions
 function render_alert($type, $title, $message = '', $href = '#', $link_text = '') {
   echo
-  "<div class='position-fixed end-0 top-0 mt-5 mx-3'>
+  "<div class='position-fixed end-0 top-0 mt-5 mx-3' style='z-index: 999'>
     <div class='alert alert-{$type} alert-dismissible me-3' role='alert'>
       <div class='d-flex'>
         <div>

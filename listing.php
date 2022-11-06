@@ -65,6 +65,8 @@
         $vacancies_text = $vacancies == 0 || $vacancies > 1 ? 'vacancies' : 'vacancy';
         $people_per_room_text = $people_per_room == 1 ? 'person' : 'people';
 
+        $book_button_classlist = $vacancies == 0 ? 'btn disabled bg-gray-100 text-gray-200 w-100' : 'btn btn-primary w-100';
+
         echo "
           <div class='container mt-4 mt-lg-5 mb-2 mb-lg-3'>
             <div class='d-flex flex-column'>
@@ -176,7 +178,7 @@
                         <p class='text-gray-500'>{$people_per_room} {$people_per_room_text} / room </p>
                       </div>
     
-                      <a href='#' class='btn btn-primary w-100' data-bs-toggle='modal' data-bs-target='#modal-scrollable'>
+                      <a href='#' class='{$book_button_classlist}' data-bs-toggle='modal' data-bs-target='#modal-scrollable'>
                         Book Now
                       </a>
                     </div>
@@ -204,44 +206,48 @@
               </div>
             </div>
           </div>
-          ";
+        ";
       }
       ?>
 
       <?php
       if (isset($_GET['listing-id']) && isset($_GET['make-booking'])) {
 
-        // If user is not logged in
+        // ? If user is not logged in
         if (empty($_SESSION['user_id'])) {
-          header('Location: ./login.php?checkpoint=not-logged-in&location=' . urlencode($_SERVER['REQUEST_URI']));
+          header('Location: ./login.php?checkpoint=not-logged-in');
         }
 
-        // ! Handle users that are not logged in
-
+        // ? If user is logged in
         if (!empty($_SESSION['user_id'])) {
           $user_id = $_SESSION['user_id'];
-          $boarding_house_id = $_GET['listing-id'];
+          $listing_id = $_GET['listing-id'];
+
+          // ? If there are no vacancies
+          if ($vacancies == 0) {
+            render_alert('danger', 'Booking failed', 'There are no vacancies at this boarding house. ', './index.php', 'Search again.');
+          }
 
           // ? Ensure user is a student
           if ($_SESSION['account_type'] != 'student') {
-            render_alert('danger', 'Booking failed!', 'Only students can book accommodation');
+            render_alert('danger', 'Booking failed', 'Only students can make bookings.');
           }
 
           if ($_SESSION['account_type'] == 'student') {
-            // Check if user already has a booking at a given property
-            $results_user_bookings = get_user_bookings_at_listing($user_id, $boarding_house_id);
+            // ? Check if user already has a booking at a given property
+            $results_user_bookings = get_user_bookings_at_listing($user_id, $listing_id);
             $count_user_bookings = mysqli_num_rows($results_user_bookings);
 
             if ($count_user_bookings > 0) {
-              render_alert('danger', 'Booking failed!', 'You already booked a room here. ', './student/index.php', 'View your bookings.');
+              render_alert('danger', 'Booking failed', 'You already have a booking here. ', './student/index.php', 'View your bookings.');
             }
 
-            if ($count_user_bookings == 0) {
-              update_vacancies("decrease", $boarding_house_id);
-              $result_booking = create_booking($user_id, $boarding_house_id);
+            if ($count_user_bookings == 0 && $vacancies > 0) {
+              update_vacancies("decrease", $listing_id);
+              $result_booking = create_booking($user_id, $listing_id);
 
               if ($result_booking) {
-                render_alert('success', 'Booking successful!', 'To view your bookings, ', './student/index.php', 'go to your dashboard');
+                render_alert('success', 'Booking successful', 'To view your bookings, go to ', './student/index.php', 'your dashboard');
               }
             }
           }

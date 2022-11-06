@@ -67,10 +67,11 @@
                       <table class='table table-mobile-xl card-table table-vcenter'>
                         <thead>
                           <tr>
+                            <th d-none d-xl-table-cell>#</th>
                             <th>BH Name</th>
                             <th>BH Address</th>
                             <th>Date Created</th>
-                            <th>Rent Due Date</th>
+                            <th>Date Approved</th>
                             <th>Status</th>
                             <th></th>
                           </tr>
@@ -78,6 +79,8 @@
                         <tbody>
                 ";
             }
+
+            $iteration_count = 1;
 
             while ($row_booking = mysqli_fetch_assoc($results_bookings)) {
               // ? Fetch and store tenant details
@@ -120,6 +123,7 @@
               if (strtolower($booking_status) == 'pending') {
                 echo "
                   <tr>
+                    <td data-label='#' class='text-gray-300 d-none d-xl-table-cell'>{$iteration_count}</td>
                     <td data-label='BH Name'>{$listing_name}</td>
                     <td data-label='BH Address'>{$listing_address}, {$listing_township}</td>
                     <td data-label='Date Created'>{$booking_date_formated}</td>
@@ -145,11 +149,12 @@
               if (strtolower($booking_status) == 'approved') {
                 echo "
                   <tr>
+                    <td data-label='#' class='text-gray-300 d-none d-xl-table-cell'>{$iteration_count}</td>
                     <td data-label='BH Name'>{$listing_name}</td>
                     <td data-label='BH Address'>{$listing_address}, {$listing_township}</td>
                     <td data-label='Date Created'>{$booking_date_formated}</td>
                     <td data-label='Date Approved'>{$booking_date_approved_formated}</td>
-                    <td class='text-success}' data-label='Status'>{$booking_status}</td>
+                    <td class='text-success' data-label='Status'>{$booking_status}</td>
                     <td class='text-xl-end'>
                       <span class='dropdown'>
                         <button class='btn dropdown-toggle align-text-top d-inline-block' data-bs-toggle='dropdown'>Actions</button>
@@ -157,7 +162,10 @@
                           <a class='dropdown-item' href='tel:+260{$owner_phone_number}'>
                             Call Property Owner
                           </a>
-                          <a class='dropdown-item text-danger' href='./?cancel-booking={$booking_id}'>
+                          <a class='dropdown-item' href='../listing.php?listing-id={$listing_id}'>
+                            View Listing
+                          </a>
+                          <a class='dropdown-item text-danger' onclick='return confirm(\"Are you sure you want to cancel this booking?\")' href='./?cancel-booking={$booking_id}'>
                             Cancel Booking
                           </a>
                         </div>

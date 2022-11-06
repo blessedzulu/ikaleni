@@ -24,9 +24,6 @@
       if (isset($_POST['submit-listing'])) {
         $conn = connect();
 
-        $features_str = '';
-        $features_arr = [];
-
         // Basic Attributes
         $name = mysqli_real_escape_string($conn, $_POST['name']);
         $address = mysqli_real_escape_string($conn, $_POST['address']);
@@ -45,6 +42,9 @@
         move_uploaded_file($cover_image_temp, "../assets/img/listings/{$cover_image}");
 
         // Features
+        $features_str = '';
+        $features_arr = [];
+
         $result_features = get_all_features();
         $row = mysqli_fetch_assoc($result_features);
         $features = $row['features'];
@@ -73,7 +73,7 @@
           </div>
           <div class="mb-3">
             <div class="form-label">Boarding House Cover Image</div>
-            <input type="file" name="cover-image" class="form-control">
+            <input type="file" name="cover-image" class="form-control" required>
           </div>
           <div class="mb-3">
             <label class="form-label required">Township</label>
@@ -111,7 +111,7 @@
           </div>
           <div class="mb-3">
             <label class="form-label" for="description">Boarding House Description</label>
-            <textarea id="description" rows="5" name="description" class=" form-control" required placeholder="Information about the boarding house, its unique selling points, room options, and why students would want to stay here"></textarea>
+            <textarea id="description" rows="5" name="description" class=" form-control" required placeholder="Information about the boarding house, its unique selling points, the rooms, and why students would want to stay here"></textarea>
           </div>
 
           <div class="mb-3">
@@ -145,7 +145,7 @@
             <textarea rows="5" name="rules" class="form-control" placeholder="Information about curfew, guests and other rules that tenants should observe" required></textarea>
           </div>
           <div class="form-footer">
-            <button type="submit" name="submit-listing" class="btn btn-primary w-100">Submit Your Listing</button>
+            <button type="submit" name="submit-listing" class="btn btn-primary w-100">Create Listing</button>
           </div>
         </div>
       </form>
@@ -155,25 +155,7 @@
 
   <?php
   if (isset($_POST['submit-listing']) && $result) {
-    echo
-    "<div class='position-fixed end-0 top-0 mt-5 mx-3'>
-      <div class='alert alert-success alert-dismissible me-3' role='alert'>
-          <div class='d-flex'>
-            <div>
-              <svg xmlns='http://www.w3.org/2000/svg' class='icon alert-icon' width='24' height='24' viewBox='0 0 24 24'
-                stroke-width='2' stroke='currentColor' fill='none' stroke-linecap='round' stroke-linejoin='round'>
-                <path stroke='none' d='M0 0h24v24H0z' fill='none'></path>
-                <path d='M5 12l5 5l10 -10'></path>
-              </svg>
-            </div>
-            <div>
-              <h4 class='alert-title'>Property listing successful</h4>
-              <div class='text-gray-500 fs-5'><a href='./index.php' class='link link-success'>View all your listigs</a> on your dashboard</div>
-            </div>
-          </div>
-          <a class='btn-close' data-bs-dismiss='alert' aria-label='close'></a>
-        </div>
-    </div>";
+    render_alert('success', 'Property listed successfully', 'View your listings on ', './index.php', 'your dashboard.');
   }
   ?>
 </body>

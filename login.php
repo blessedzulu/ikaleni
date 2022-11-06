@@ -19,12 +19,6 @@
       <!-- Form Handler -->
       <?php
 
-      $location = '';
-
-      if (isset($_GET['location'])) {
-        $location = $_GET['location'];
-      }
-
       if (isset($_GET['log-in'])) {
         if (isset($_GET['email']) && isset($_GET['password'])) {
           $conn = connect();
@@ -32,23 +26,27 @@
           $email = $_GET['email'];
           $password = $_GET['password'];
 
-          $user_result = get_user_by_email($email);
-          $count = mysqli_num_rows($user_result);
+          $result_user = get_user_by_email($email);
+          $count = mysqli_num_rows($result_user);
 
-          if ($count != 0) {
-            while ($row = mysqli_fetch_assoc($user_result)) {
-              $user_id = $row['id'];
-              $first_name = $row['first_name'];
-              $last_name = $row['last_name'];
-              $account_type = $row['account_type'];
-              $email = $row['email'];
-              $phone_number = $row['phone_number'];
-              $hash = $row['password'];
-            }
+          if ($count > 0) {
+            $row_user = mysqli_fetch_assoc($result_user);
+            $user_id = $row_user['id'];
+            $first_name = $row_user['first_name'];
+            $last_name = $row_user['last_name'];
+            $account_type = $row_user['account_type'];
+            $email = $row_user['email'];
+            $phone_number = $row_user['phone_number'];
+            $hash = $row_user['password'];
 
             if ($password_correct = password_verify($password, $hash)) {
-              authenticate($user_id, $account_type, $first_name, $last_name, $email, $phone_number, $location);
+              authenticate($user_id, $account_type, $first_name, $last_name, $email, $phone_number);
             };
+          }
+
+          // ? Email address not in use
+          if ($count == 0) {
+            render_alert('danger', 'Login failed', 'No account found for your email. ', './sign-up.php', 'Sign up here.');
           }
         }
       }
@@ -57,8 +55,6 @@
       <form class="card card-md" action="./login.php" method="get">
         <div class="card-body">
           <h2 class="h5 text-center mb-4">Login to your account</h2>
-          <h2 class="h5 text-center mb-4"><?= $location ?></h2>
-          <h2 class="h5 text-center mb-4"><?= !empty($location) ?></h2>
           <div class="mb-3">
             <label class="form-label required">Email</label>
             <input type="email" class="form-control" placeholder="Enter email" name="email" required>
@@ -96,8 +92,12 @@
   </div>
 
   <?php
-  if (isset($_GET['log-in']) && empty($password_correct)) {
-    render_alert('danger', 'Incorrect login details', 'Please try again');
+  if (isset($_GET['log-in']) && $count > 0 && !$password_correct) {
+    header('Location: ./login.php?checkpoint=wrong-password');
+  }
+
+  if (isset($_GET['checkpoint']) && $_GET['checkpoint'] == 'wrong-password') {
+    render_alert('danger', 'Login failed', 'Wrong password. Please try again.');
   }
 
   if (isset($_GET['checkpoint']) && $_GET['checkpoint'] == 'no-access') {
@@ -106,6 +106,10 @@
 
   if (isset($_GET['checkpoint']) && $_GET['checkpoint'] == 'not-logged-in' && !isset($_SESSION['user_id'])) {
     render_alert('warning', 'You are not logged in', 'Log in or sign up for an account to continue.');
+  }
+
+  if (isset($_GET['referrer']) == 'new-account') {
+    render_alert('success', 'Account created successfully', 'Log into your new account to continue.');
   }
   ?>
 </body>

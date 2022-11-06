@@ -124,7 +124,7 @@
                 $vacancies_text = $vacancies == 0 || $vacancies > 1 ? 'vacancies' : 'vacancy';
 
                 echo "
-                <div class='col col-12 col-sm-6 col-md-4 col-lg-3 mb-3'>
+                <div class='col col-12 col-sm-6 col-xl-3 mb-3'>
                   <div class='card card-sm bg-white shadow hover-shadow'>
                     <div class='ratio ratio-16x9'>
                       <img class='d-block w-100 card-img-top object-cover' alt='Boarding house cover image' src='./assets/img/listings/{$cover_image}'>
@@ -139,7 +139,7 @@
                             <path d='M17.657 16.657l-4.243 4.243a2 2 0 0 1 -2.827 0l-4.244 -4.243a8 8 0 1 1 11.314 0z'>
                             </path>
                           </svg>
-                          <span class='me-1'>{$address},</span><span>{$township}</span>
+                          <span>{$address} {$township}</span>
       
                         </p>
                         <div class='d-flex align-items-baseline gap-1'>

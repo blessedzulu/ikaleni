@@ -145,35 +145,35 @@ h1,
 }
 
 @media screen and (min-width: 768px) {
-h1,
-.h1 {
-  font-size: 3rem;
-}
+  h1,
+  .h1 {
+    font-size: 3rem;
+  }
 
-h2,
-.h2 {
-  font-size: 2.5rem;
-}
+  h2,
+  .h2 {
+    font-size: 2.5rem;
+  }
 
-h3,
-.h3 {
-  font-size: 2rem;
-}
+  h3,
+  .h3 {
+    font-size: 2rem;
+  }
 
-h4,
-.h4 {
-  font-size: 1.75rem;
-}
+  h4,
+  .h4 {
+    font-size: 1.75rem;
+  }
 
-h5,
-.h5 {
-  font-size: 1.5rem;
-}
+  h5,
+  .h5 {
+    font-size: 1.5rem;
+  }
 
-h6,
-.h6 {
-  font-size: 1.25rem;
-}
+  h6,
+  .h6 {
+    font-size: 1.25rem;
+  }
 }
 
 h1,
@@ -518,8 +518,8 @@ progress {
   --ikln-gutter-x: 1.5rem;
   --ikln-gutter-y: 0;
   width: 100%;
-  padding-right: calc(var(--ikln-gutter-x) * 0.5);
-  padding-left: calc(var(--ikln-gutter-x) * 0.5);
+  padding-right: var(--ikln-gutter-x);
+  padding-left: var(--ikln-gutter-x);
   margin-right: auto;
   margin-left: auto;
 }
@@ -529,7 +529,19 @@ progress {
   .container {
     max-width: 540px;
   }
+
+  .container,
+  .container-fluid,
+  .container-xxl,
+  .container-xl,
+  .container-lg,
+  .container-md,
+  .container-sm {
+    padding-right: calc(var(--ikln-gutter-x) * 0.5);
+    padding-left: calc(var(--ikln-gutter-x) * 0.5);
+  }
 }
+
 @media (min-width: 768px) {
   .container-md,
   .container-sm,
