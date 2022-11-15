@@ -18,7 +18,6 @@
     <div class="container-tight py-4 mt-4">
       <!-- Form Handler -->
       <?php
-
       if (isset($_GET['log-in'])) {
         if (isset($_GET['email']) && isset($_GET['password'])) {
           $conn = connect();
@@ -39,14 +38,19 @@
             $phone_number = $row_user['phone_number'];
             $hash = $row_user['password'];
 
+            // ? Authenticaton & authorisation
             if ($password_correct = password_verify($password, $hash)) {
-              authenticate($user_id, $account_type, $first_name, $last_name, $email, $phone_number);
-            };
+              authorise_user($user_id, $account_type, $first_name, $last_name, $email, $phone_number);
+            }
+
+            if (!$password_correct) {
+              header('Location: ./login.php?checkpoint=wrong-password');
+            }
           }
 
           // ? Email address not in use
           if ($count == 0) {
-            render_alert('danger', 'Login failed', 'No account found for your email. ', './sign-up.php', 'Sign up here.');
+            render_alert('danger', 'Login failed', 'No account found for that email. ', './sign-up.php', 'Sign up here.');
           }
         }
       }
@@ -92,9 +96,6 @@
   </div>
 
   <?php
-  if (isset($_GET['log-in']) && $count > 0 && !$password_correct) {
-    header('Location: ./login.php?checkpoint=wrong-password');
-  }
 
   if (isset($_GET['checkpoint']) && $_GET['checkpoint'] == 'wrong-password') {
     render_alert('danger', 'Login failed', 'Wrong password. Please try again.');

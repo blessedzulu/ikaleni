@@ -22,11 +22,12 @@ function query_db($connection, $query) {
   return $result;
 }
 
+// ? Users
 function create_user($account_type, $first_name, $last_name, $email, $password, $phone_number) {
   $conn = connect();
 
-  $query = "INSERT INTO users(account_type, first_name, last_name, email, password, phone_number) 
-            VALUES('$account_type', '$first_name', '$last_name', '$email', '$password', '$phone_number')";
+  $query = "INSERT INTO users(account_type, first_name, last_name, email, password, phone_number)";
+  $query .= " VALUES('$account_type', '$first_name', '$last_name', '$email', '$password', '$phone_number')";
 
   return query_db($conn, $query);
 }
@@ -50,7 +51,7 @@ function get_all_users() {
   return query_db($conn, $query);
 }
 
-function authenticate($user_id, $account_type, $first_name, $last_name, $email, $phone_number) {
+function authorise_user($user_id, $account_type, $first_name, $last_name, $email, $phone_number) {
   ob_start();
   session_start();
 
@@ -74,6 +75,7 @@ function authenticate($user_id, $account_type, $first_name, $last_name, $email, 
   ob_end_flush();
 }
 
+// ? Listings & listing features
 function get_all_features() {
   $conn = connect();
   $query = "SELECT * FROM listing_features";
@@ -117,16 +119,16 @@ function search_listings($township, $gender, $min_price, $max_price) {
   return query_db($conn, $query);
 }
 
-function update_vacancies($operation, $boarding_house_id) {
+function update_vacancies($operation, $listing_id) {
   $conn = connect();
 
   if ($operation == "decrease") {
-    $query = "UPDATE listings SET vacancies = vacancies - 1 WHERE vacancies > 0 AND id = $boarding_house_id";
+    $query = "UPDATE listings SET vacancies = vacancies - 1 WHERE vacancies > 0 AND id = $listing_id";
     return query_db($conn, $query);
   }
 
   if ($operation == "increase") {
-    $query = "UPDATE listings SET vacancies = vacancies + 1 WHERE vacancies < capacity AND id = $boarding_house_id";
+    $query = "UPDATE listings SET vacancies = vacancies + 1 WHERE vacancies < capacity AND id = $listing_id";
     return query_db($conn, $query);
   }
 };
@@ -137,10 +139,11 @@ function delete_listing($listing_id) {
   return query_db($conn, $query);
 }
 
-function create_booking($tenant_id, $boarding_house_id) {
+// ? Bookings
+function create_booking($tenant_id, $listing_id) {
   $conn = connect();
   $query = "INSERT INTO bookings(tenant_id, boarding_house_id, date_created, date_approved, status)";
-  $query .= " VALUES ($tenant_id, $boarding_house_id, NOW(), '-', 'Pending')";
+  $query .= " VALUES ($tenant_id, $listing_id, NOW(), '-', 'Pending')";
   return query_db($conn, $query);
 }
 
@@ -209,8 +212,8 @@ function check_page_access($account_type) {
 
 // ? UI Rendering Functions
 function render_alert($type, $title, $message = '', $href = '#', $link_text = '') {
-  echo
-  "<div class='position-fixed end-0 top-0 mt-5 mx-3' style='z-index: 999'>
+  echo "
+  <div class='position-fixed end-0 top-0 mt-5 mx-3' style='z-index: 999'>
     <div class='alert alert-{$type} alert-dismissible me-3' role='alert'>
       <div class='d-flex'>
         <div>
