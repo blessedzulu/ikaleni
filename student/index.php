@@ -82,16 +82,16 @@
 
             $iteration_count = 1;
 
-            while ($row_booking = mysqli_fetch_assoc($results_bookings)) {
+            while ($row_bookings = mysqli_fetch_assoc($results_bookings)) {
               // ? Fetch and store tenant details
-              $tenant_id = $row_booking['tenant_id'];
+              $tenant_id = $row_bookings['tenant_id'];
               $result_tenant = get_user_by_id($tenant_id);
               $row_tenant = mysqli_fetch_assoc($result_tenant);
               $tenant_first_name = $row_tenant['first_name'];
               $tenant_last_name = $row_tenant['last_name'];
 
               // ? Fetch and store boarding house details
-              $listing_id = $row_booking['boarding_house_id'];
+              $listing_id = $row_bookings['boarding_house_id'];
               $result_listing = get_listing($listing_id);
               $row_listing = mysqli_fetch_assoc($result_listing);
               $listing_name = $row_listing['name'];
@@ -105,16 +105,16 @@
               $owner_phone_number = $row_owner['phone_number'];
 
               // ? Booking Details
-              $booking_id = $row_booking['id'];
-              $booking_status = $row_booking['status'];
+              $booking_id = $row_bookings['id'];
+              $booking_status = $row_bookings['status'];
 
-              $booking_date_created = $row_booking['date_created'];
+              $booking_date_created = $row_bookings['date_created'];
               $booking_date_day = date('j',  strtotime($booking_date_created));
               $booking_date_month = date('F',  strtotime($booking_date_created));
               $booking_date_year = date('Y',  strtotime($booking_date_created));
               $booking_date_formated = date('j F, Y',  strtotime($booking_date_created));
 
-              $booking_date_approved = $row_booking['date_approved'];
+              $booking_date_approved = $row_bookings['date_approved'];
               $booking_date_approved_day = date('j',  strtotime($booking_date_approved));
               $booking_date_approved_month = date('F',  strtotime($booking_date_approved));
               $booking_date_approved_year = date('Y',  strtotime($booking_date_approved));
@@ -174,7 +174,10 @@
                   </tr>
                 ";
               }
+
+              $iteration_count += 1;
             }
+
             ?>
             </tbody>
             </table>

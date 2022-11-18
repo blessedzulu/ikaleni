@@ -16,8 +16,10 @@ function connect() {
 
 function query_db($connection, $query) {
   if (!$result = mysqli_query($connection, $query)) {
-    return die("Database query failed.");
+    return die("Query execution failed.");
   }
+
+  mysqli_close($connection);
 
   return $result;
 }
@@ -171,6 +173,20 @@ function get_property_bookings($property_id) {
   return query_db($conn, $query);
 }
 
+function search_property_bookings($property_id, $first_name, $last_name) {
+  $conn = connect();
+  $search_query = "SELECT *, bookings.id as booking_id FROM bookings JOIN users on bookings.tenant_id = users.id JOIN listings on bookings.boarding_house_id = listings.id WHERE boarding_house_id = $property_id AND (first_name LIKE '$first_name%' OR first_name LIKE '$last_name%' OR last_name LIKE '$last_name%' OR last_name LIKE '$first_name%') ORDER BY users.first_name ASC";
+
+  return query_db($conn, $search_query);
+}
+
+function search_bookings_by_status($status, $first_name, $last_name) {
+  $conn = connect();
+  $search_query = "SELECT *, bookings.id as booking_id FROM bookings JOIN users on bookings.tenant_id = users.id JOIN listings on bookings.boarding_house_id = listings.id WHERE status = '$status' AND (first_name LIKE '$first_name%' OR first_name LIKE '$last_name%' OR last_name LIKE '$last_name%' OR last_name LIKE '$first_name%') ORDER BY users.first_name ASC";
+
+  return query_db($conn, $search_query);
+}
+
 function get_user_bookings($user_id) {
   $conn = connect();
   $query = "SELECT * FROM bookings WHERE tenant_id = $user_id ORDER BY date_created DESC";
@@ -205,7 +221,8 @@ function hyphenate_string($string) {
 
 function check_page_access($account_type) {
   if (empty($_SESSION['user_id']) || $_SESSION['account_type'] != $account_type) {
-    header('Location: ../login.php?checkpoint=no-access');
+    $_SESSION['status'] = 'no-access';
+    header('Location: ../login.php');
     ob_end_flush();
   }
 }

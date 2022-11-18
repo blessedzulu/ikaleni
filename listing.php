@@ -12,6 +12,33 @@
 </head>
 
 <body>
+  <?php
+  // ? Status Alerts
+  if (isset($_SESSION['status'])) {
+
+    if ($_SESSION['status'] == 'create-booking-success') {
+      render_alert('success', 'Booking successful', 'To view your bookings, go to ', './student/index.php', 'your dashboard');
+    }
+
+    if ($_SESSION['status'] == 'create-booking-failed') {
+      if ($_SESSION['status-message'] == 'booking-already-exists') {
+        render_alert('danger', 'Booking failed', 'You already have a booking here. ', './student/index.php', 'View your bookings.');
+      }
+
+      if ($_SESSION['status-message'] == 'no-vacancies') {
+        render_alert('danger', 'Booking failed', 'There are no vacancies at this boarding house. ', './index.php', 'Search again.');
+      }
+
+      if ($_SESSION['status-message'] == 'invalid-account-type') {
+        render_alert('danger', 'Booking failed', 'Only students can make bookings.');
+      }
+    }
+
+    unset($_SESSION['status']);
+    unset($_SESSION['status-message']);
+  }
+  ?>
+
   <div class="page">
     <!-- ! Header & Navigation -->
     <header class="navbar navbar-expand-md navbar-light">
@@ -213,9 +240,12 @@
       <?php
       if (isset($_GET['listing-id']) && isset($_GET['make-booking'])) {
 
+        $listing_id = $_GET['listing-id'];
+
         // ? If user is not logged in
         if (empty($_SESSION['user_id'])) {
-          header('Location: ./login.php?checkpoint=not-logged-in');
+          header('Location: ./login.php');
+          $_SESSION['status'] = 'not-logged-in';
         }
 
         // ? If user is logged in
@@ -225,12 +255,16 @@
 
           // ? If there are no vacancies
           if ($vacancies == 0) {
-            render_alert('danger', 'Booking failed', 'There are no vacancies at this boarding house. ', './index.php', 'Search again.');
+            $_SESSION['status'] = 'create-booking-failed';
+            $_SESSION['status-message'] = 'no-vacancies';
+            header('Location: ./listing.php?listing-id=' . $listing_id);
           }
 
           // ? Ensure user is a student
           if ($_SESSION['account_type'] != 'student') {
-            render_alert('danger', 'Booking failed', 'Only students can make bookings.');
+            $_SESSION['status'] = 'create-booking-failed';
+            $_SESSION['status-message'] = 'invalid-account-type';
+            header('Location: ./listing.php?listing-id=' . $listing_id);
           }
 
           if ($_SESSION['account_type'] == 'student') {
@@ -239,7 +273,9 @@
             $count_user_bookings = mysqli_num_rows($results_user_bookings);
 
             if ($count_user_bookings > 0) {
-              render_alert('danger', 'Booking failed', 'You already have a booking here. ', './student/index.php', 'View your bookings.');
+              $_SESSION['status'] = 'create-booking-failed';
+              $_SESSION['status-message'] = 'booking-already-exists';
+              header('Location: ./listing.php?listing-id=' . $listing_id);
             }
 
             if ($count_user_bookings == 0 && $vacancies > 0) {
@@ -247,13 +283,14 @@
               $result_booking = create_booking($user_id, $listing_id);
 
               if ($result_booking) {
-                render_alert('success', 'Booking successful', 'To view your bookings, go to ', './student/index.php', 'your dashboard');
+                $_SESSION['status'] = 'create-booking-success';
+                header('Location: ./listing.php?listing-id=' . $listing_id);
+                ob_end_flush();
               }
             }
           }
         }
       }
-
       ?>
     </main>
 

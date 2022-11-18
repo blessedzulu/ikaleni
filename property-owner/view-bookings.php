@@ -13,6 +13,25 @@
 </head>
 
 <body class="border-top-wide border-primary d-flex flex-column">
+  <?php
+  // ? Status Alerts
+  if (isset($_SESSION['status'])) {
+    if ($_SESSION['status'] == 'approve-booking-success') {
+      render_alert('success', 'Booking approved', 'Booking approved successfully.');
+    }
+
+    if ($_SESSION['status'] == 'cancel-booking-success') {
+      render_alert('success', 'Booking cancelled', 'Booking cancelled successfully.');
+    }
+
+    if ($_SESSION['status'] == 'decline-booking-success') {
+      render_alert('success', 'Booking declined', 'Booking declined successfully.');
+    }
+
+    unset($_SESSION['status']);
+  }
+  ?>
+
   <header class="navbar navbar-expand-md navbar-light">
     <?php include("../includes/navigation.php") ?>
   </header>
@@ -33,13 +52,20 @@
               if (isset($_GET['listing-id'])) {
                 $result_listing = get_listing($_GET['listing-id']);
 
-                $row_listing = mysqli_fetch_assoc($result_listing);
+                $count = mysqli_num_rows($result_listing);
 
+                if ($count == 0) {
+                  header('Location: ./');
+                  ob_end_flush();
+                }
+
+                $row_listing = mysqli_fetch_assoc($result_listing);
                 $listing_name = $row_listing['name'];
               }
+
               echo "
               <h2 class='h6'>Bookings for <span>{$listing_name}</span></h2>
-              "
+              ";
               ?>
 
             </div>
@@ -51,25 +77,27 @@
             <div class="col-12">
               <!-- ! Search bookings -->
               <form method="post" action="./results-bookings.php">
-                <div class="input-icon mb-3">
-                  <input type="search" value="" class="form-control form-control-rounded" placeholder="Search by tenant name…">
-                  <span class="input-icon-addon">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                      <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-                      <circle cx="10" cy="10" r="7"></circle>
-                      <line x1="21" y1="21" x2="15" y2="15"></line>
-                    </svg>
-                  </span>
+                <div class="mb-3">
+                  <div class="input-group mb-2">
+                    <input type="text" class="form-control" name="search-query" placeholder="Search by tenant name…">
+                    <button class="btn btn-primary" type="submit" name="submit-search">Search</button>
+                  </div>
                 </div>
-
               </form>
             </div>
 
             <?php
 
             if (isset($_GET['listing-id'])) {
+              $_SESSION['search-listing-id'] = $_GET['listing-id'];
               $results_bookings = get_property_bookings($_GET['listing-id']);
               $count = mysqli_num_rows($results_bookings);
+              $owner_id = $row_listing['owner_id'];
+            }
+
+            if ($_SESSION['user_id'] != $owner_id) {
+              header('Location: ./');
+              ob_end_flush();
             }
 
             if ($count == 0) {
@@ -223,13 +251,13 @@
 
     if (($_SESSION['user_id'] == $owner_id)) {
       $result_approve_booking = approve_booking($booking_id);
-      header('Location: ./view-bookings.php?listing-id=' . $listing_id . '&approve-booking-status=success');
+
+      if ($result_approve_booking) {
+        $_SESSION['status'] = 'approve-booking-success';
+        header('Location: ./view-bookings.php?listing-id=' . $listing_id);
+        ob_end_flush();
+      }
     }
-  }
-
-
-  if (isset($_GET['approve-booking-status']) == "success") {
-    render_alert('success', 'Booking approved', 'Booking approved successfully.');
   }
 
   //  ? Handle Booking Cancellations
@@ -250,31 +278,22 @@
     if (($_SESSION['user_id'] == $owner_id)) {
       $result_delete_booking = delete_booking($booking_id);
 
-      if (!empty($result_delete_booking)) {
+      if ($result_delete_booking) {
         $result_update_vacancies = update_vacancies("increase", $listing_id);
 
         if (isset($_GET['cancel-booking'])) {
-          header('Location: ./view-bookings.php?listing-id=' . $listing_id . '&cancel-booking-status=success');
+          $_SESSION['status'] = 'cancel-booking-success';
         }
 
         if (isset($_GET['decline-booking'])) {
-          header('Location: ./view-bookings.php?listing-id=' . $listing_id . '&decline-booking-status=success');
+          $_SESSION['status'] = 'decline-booking-success';
         }
 
+        header('Location: ./view-bookings.php?listing-id=' . $listing_id);
         ob_end_flush();
       }
     };
   }
-
-  if (isset($_GET['cancel-booking-status']) == "success") {
-    render_alert('success', 'Booking cancelled', 'Booking cancelled successfully.');
-  }
-
-  if (isset($_GET['decline-booking-status']) == "success") {
-    render_alert('success', 'Booking declined', 'Booking declined successfully.');
-  }
-
-
   ?>
 
   </div>

@@ -28,7 +28,17 @@
           </div>
 
           <div class="row">
-
+            <div class="col-12">
+              <!-- ! Search bookings -->
+              <form method="post" action="./results-students.php">
+                <div class="mb-3">
+                  <div class="input-group mb-2">
+                    <input type="text" class="form-control" name="search-query" placeholder="Search by tenant name…">
+                    <button class="btn btn-primary" type="submit" name="submit-search">Search</button>
+                  </div>
+                </div>
+              </form>
+            </div>
 
             <?php
             $results_bookings = get_all_bookings_by_status('Approved');
@@ -45,22 +55,7 @@
             }
 
             if ($count > 0) {
-              echo "
-                <div class='col-12'>
-                  <form method='post' action='./results-students.php'>
-                    <div class='input-icon mb-3'>
-                      <input type='search' value='' class='form-control form-control-rounded' placeholder='Search by student name...'>
-                      <span class='input-icon-addon'>
-                        <svg xmlns='http://www.w3.org/2000/svg' class='icon' width='24' height='24' viewBox='0 0 24 24' stroke-width='2' stroke='currentColor' fill='none' stroke-linecap='round' stroke-linejoin='round'>
-                          <path stroke='none' d='M0 0h24v24H0z' fill='none'></path>
-                          <circle cx='10' cy='10' r='7'></circle>
-                          <line x1='21' y1='21' x2='15' y2='15'></line>
-                        </svg>
-                      </span>
-                    </div>
-                  </form>
-                </div>
-              
+              echo "              
                 <div class='col-12'>
                   <div class='card'>
                     <div class='table mb-0'>

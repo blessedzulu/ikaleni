@@ -130,7 +130,7 @@
       <!-- ! Quick Discovery -->
       <div class="container mb-5 mb-lg-7">
         <div class="d-flex flex-column align-items-center">
-          <h2 class="h2 mb-4 mb-lg-5 text-center">Quick Discovery</h2>
+          <h2 class="h2 mb-4 mb-lg-5 text-center">Discover Boarding Houses</h2>
 
           <div class="row w-100 justify-content-between align-items-center mb-5">
             <div class="col col-12 col-lg-4 order-last order-lg-0">
@@ -139,9 +139,7 @@
 
                   <h5 class="h5 mb-3">Female Boarding Houses</h5>
                   <p class="text-gray-500 mb-3">
-                    Integer feugiat morbi enim venenatis, eget amet faucibus ultrices sed at mauris sapien arcu,
-                    mollis nibh eu pellentesque
-                    nulla iaculis venenatis scelerisque risus.
+                    Boarding houses tailored for female students. If you're looking for female-only boarding houses, Ikaleni can help you find a suitable boarding house quickly.
                   </p>
                   <a href="#" class="link">
                     Find Female Boarding Houses
@@ -170,9 +168,7 @@
 
                   <h5 class="h5 mb-3">Male Boarding Houses</h5>
                   <p class="text-gray-500 mb-3">
-                    Integer feugiat morbi enim venenatis, eget amet faucibus ultrices sed at mauris sapien arcu,
-                    mollis nibh eu pellentesque
-                    nulla iaculis venenatis scelerisque risus.
+                    Male boarding houses are ideal for male students looking to live with or around other males. Ikaleni can help you find such accommodation.
                   </p>
                   <a href="#" class="link">
                     Find Male Boarding Houses
@@ -195,9 +191,7 @@
 
                   <h5 class="h5 mb-3">Unisex Boarding Houses</h5>
                   <p class="text-gray-500 mb-3">
-                    Integer feugiat morbi enim venenatis, eget amet faucibus ultrices sed at mauris sapien arcu,
-                    mollis nibh eu pellentesque
-                    nulla iaculis venenatis scelerisque risus.
+                    If you do not have a preference, a unisex boarding house might be worth considering. Ikaleni can help you find one quickly.
                   </p>
                   <a href="#" class="link">
                     Find Unisex Boarding Houses

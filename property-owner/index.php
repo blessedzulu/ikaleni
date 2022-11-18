@@ -17,6 +17,17 @@
     <?php include("../includes/navigation.php") ?>
   </header>
 
+  <?php
+  // ? Status Alerts
+  if (isset($_SESSION['status'])) {
+    if ($_SESSION['status'] == 'delete-listing-success') {
+      render_alert('success', 'Listing deleted', 'Listing deleted successfully.');
+    }
+
+    unset($_SESSION['status']);
+  }
+  ?>
+
   <div class="page">
     <div class="page-wrapper">
       <div class="page-body">
@@ -129,13 +140,12 @@
 
         if (($_SESSION['user_id'] == $owner_id)) {
           $result_delete_listing = delete_listing($listing_id);
-          header('Location: ./?delete-listing-status=success');
+          $_SESSION['status'] = 'delete-listing-success';
+          header('Location: ./');
+          ob_end_flush();
         }
       }
 
-      if (isset($_GET['delete-listing-status']) == "success") {
-        render_alert('success', 'Listing declined', 'Listing deleted successfully.');
-      }
       ?>
 
       <footer class="footer footer-transparent d-print-none">

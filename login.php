@@ -10,6 +10,37 @@
 </head>
 
 <body class="border-top-wide border-primary d-flex flex-column">
+  <?php
+  // ? Status Alerts
+  if (isset($_SESSION['status'])) {
+
+    if ($_SESSION['status'] == 'not-logged-in') {
+      render_alert('warning', 'You are not logged in', 'Log in or sign up for an account to continue.');
+    }
+
+    if ($_SESSION['status'] == 'no-access') {
+      render_alert('danger', 'Page inaccessible', 'You do not have permission to access that page.');
+    }
+
+    if ($_SESSION['status'] == 'create-account-success') {
+      render_alert('success', 'Account created successfully', 'Log into your new account to continue.');
+    }
+
+    if ($_SESSION['status'] == 'login-failed' && isset($_SESSION['status-message'])) {
+      if ($_SESSION['status-message'] == 'wrong-password') {
+        render_alert('danger', 'Login failed', 'Wrong password. Please try again.');
+      }
+
+      if ($_SESSION['status-message'] == 'email-not-in-use') {
+        render_alert('danger', 'Login failed', 'No account found for that email. ', './sign-up.php', 'Sign up here.');
+      }
+    }
+
+    unset($_SESSION['status']);
+    unset($_SESSION['status-message']);
+  }
+  ?>
+
   <header class="navbar navbar-expand-md navbar-light">
     <?php include("./includes/navigation.php") ?>
   </header>
@@ -44,13 +75,19 @@
             }
 
             if (!$password_correct) {
-              header('Location: ./login.php?checkpoint=wrong-password');
+              $_SESSION['status'] = 'login-failed';
+              $_SESSION['status-message'] = 'wrong-password';
+              header('Location: ./login.php');
+              ob_end_flush();
             }
           }
 
           // ? Email address not in use
           if ($count == 0) {
-            render_alert('danger', 'Login failed', 'No account found for that email. ', './sign-up.php', 'Sign up here.');
+            $_SESSION['status'] = 'login-failed';
+            $_SESSION['status-message'] = 'email-not-in-use';
+            header('Location: ./login.php');
+            ob_end_flush();
           }
         }
       }
@@ -94,25 +131,6 @@
   <div class="footer">
     <?php include("./includes/footer.php") ?>
   </div>
-
-  <?php
-
-  if (isset($_GET['checkpoint']) && $_GET['checkpoint'] == 'wrong-password') {
-    render_alert('danger', 'Login failed', 'Wrong password. Please try again.');
-  }
-
-  if (isset($_GET['checkpoint']) && $_GET['checkpoint'] == 'no-access') {
-    render_alert('warning', 'Page inaccessible', 'You do not have permission to access that page.');
-  }
-
-  if (isset($_GET['checkpoint']) && $_GET['checkpoint'] == 'not-logged-in' && !isset($_SESSION['user_id'])) {
-    render_alert('warning', 'You are not logged in', 'Log in or sign up for an account to continue.');
-  }
-
-  if (isset($_GET['referrer']) == 'new-account') {
-    render_alert('success', 'Account created successfully', 'Log into your new account to continue.');
-  }
-  ?>
 </body>
 
 </html>
