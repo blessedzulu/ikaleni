@@ -26,16 +26,6 @@
       render_alert('success', 'Account created successfully', 'Log into your new account to continue.');
     }
 
-    if ($_SESSION['status'] == 'login-failed' && isset($_SESSION['status-message'])) {
-      if ($_SESSION['status-message'] == 'wrong-password') {
-        render_alert('danger', 'Login failed', 'Wrong password. Please try again.');
-      }
-
-      if ($_SESSION['status-message'] == 'email-not-in-use') {
-        render_alert('danger', 'Login failed', 'No account found for that email. ', './sign-up.php', 'Sign up here.');
-      }
-    }
-
     unset($_SESSION['status']);
     unset($_SESSION['status-message']);
   }
@@ -49,10 +39,16 @@
     <div class="container-tight py-4 mt-4">
       <!-- Form Handler -->
       <?php
+      // ? User input
+      $email = $password = "";
+
+      // ? Input errors
+      $password_error = $email_error = $phone_number_error = "";
+      $password_error_class = $email_error_class  = "";
+      $errors_present = false;
+
       if (isset($_GET['log-in'])) {
         if (isset($_GET['email']) && isset($_GET['password'])) {
-          $conn = connect();
-
           $email = $_GET['email'];
           $password = $_GET['password'];
 
@@ -75,36 +71,42 @@
             }
 
             if (!$password_correct) {
-              $_SESSION['status'] = 'login-failed';
-              $_SESSION['status-message'] = 'wrong-password';
-              header('Location: ./login.php');
-              ob_end_flush();
+              $password_error = "Wrong password.";
+              $password_error_class = "is-invalid";
+              $errors_present = true;
             }
           }
 
           // ? Email address not in use
           if ($count == 0) {
-            $_SESSION['status'] = 'login-failed';
-            $_SESSION['status-message'] = 'email-not-in-use';
-            header('Location: ./login.php');
-            ob_end_flush();
+            $email_error = "Email is not in use. Create a new account.";
+            $email_error_class = "is-invalid";
+            $errors_present = true;
+          }
+
+          if ($errors_present) {
+            render_alert('danger', 'Login failed', 'Fix the errors and try again.');
           }
         }
       }
       ?>
 
-      <form class="card card-md" action="./login.php" method="get">
+      <form class="card card-md" action="<?= htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="get">
         <div class="card-body">
           <h2 class="h5 text-center mb-4">Login to your account</h2>
           <div class="mb-3">
             <label class="form-label required">Email</label>
-            <input type="email" class="form-control" placeholder="Enter email" name="email" required>
+            <input type="email" class="form-control <?= $email_error_class ?>" placeholder="Enter email" name="email" value="<?= $email ?>" required>
+            <div class="mt-1 fs-5 text-danger"><?= $email_error ?></div>
           </div>
           <div class="mb-3">
             <label class="form-label required">Password</label>
-            <div class="input-group input-group-flat">
-              <input type="password" class="form-control" placeholder="Password" name="password" required>
-            </div>
+            <input type="password" class="form-control <?= $password_error_class ?>" placeholder="Password" name="password" required>
+            <div class="mt-1 fs-5 text-danger"><?= $password_error ?></div>
+          </div>
+
+          <div class="">
+            <button type="submit" name="log-in" class="btn btn-primary w-100">Log In</button>
           </div>
 
           <!-- <div class="">
@@ -116,21 +118,17 @@
                 <span class="form-check-label">Remember me on this device</span>
               </label>
             </div> -->
-          <div class="form-footer">
-            <button type="submit" name="log-in" class="btn btn-primary w-100">Log In</button>
-          </div>
         </div>
       </form>
       <div class="text-center text-gray-500 mt-3">
         Don't have an account? <a href="./sign-up.php" tabindex="-1">Sign up</a>
       </div>
     </div>
-  </div>
 
-  <!-- Footer -->
-  <div class="footer">
-    <?php include("./includes/footer.php") ?>
-  </div>
+    <!-- Footer -->
+    <div class="footer">
+      <?php include("./includes/footer.php") ?>
+    </div>
 </body>
 
 </html>

@@ -227,6 +227,23 @@ function check_page_access($account_type) {
   }
 }
 
+function sanitise_input($input) {
+  $conn = connect();
+  $input = mysqli_real_escape_string($conn, $input);
+  $input = trim($input);
+  $input = stripslashes($input);
+
+  return $input;
+}
+
+function sanitise_long_input($input) {
+  $conn = connect();
+  $input = mysqli_real_escape_string($conn, $input);
+  $input = stripslashes($input);
+
+  return $input;
+}
+
 // ? UI Rendering Functions
 function render_alert($type, $title, $message = '', $href = '#', $link_text = '') {
   echo "
