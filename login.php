@@ -20,6 +20,10 @@
       render_alert('warning', 'You are not logged in', 'Log in or sign up for an account to continue.');
     }
 
+    if ($_SESSION['status'] == 'invalid-account-type') {
+      render_alert('danger', 'Login failed', 'The account type is invalid. Try again or ', './sign-up.php', 'Create a new account.');
+    }
+
     if ($_SESSION['status'] == 'no-access') {
       render_alert('danger', 'Page inaccessible', 'You do not have permission to access that page.');
     }

@@ -66,12 +66,21 @@ function authorise_user($user_id, $account_type, $first_name, $last_name, $email
 
   if ($account_type == 'student') {
     header('Location: student/index.php');
+    exit;
   }
   if ($account_type == 'property-owner') {
     header('Location: property-owner/index.php');
+    exit;
   }
   if ($account_type == 'institution-admin') {
     header('Location: institution-admin/index.php');
+    exit;
+  }
+
+  if ($account_type != 'student' && $account_type != 'property-owner' && $account_type != 'institution-admin') {
+    $_SESSION['status'] = 'invalid-account-type';
+    header('Location: ./logout.php');
+    exit;
   }
 
   ob_end_flush();

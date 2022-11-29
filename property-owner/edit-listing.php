@@ -131,7 +131,11 @@
         }
 
         // Valid characters
-        if (!str_ends_with($cover_image, strtolower('.jpg')) && !str_ends_with($cover_image, strtolower('.jpeg')) && !str_ends_with($cover_image, strtolower('.png'))) {
+        if (
+          !str_ends_with($new_cover_image, strtolower('.jpg')) &&
+          !str_ends_with($new_cover_image, strtolower('.jpeg')) &&
+          !str_ends_with($new_cover_image, strtolower('.png'))
+        ) {
           $cover_image_error = "Cover image must be a JPG or PNG image file";
           $cover_image_error_class = "is-invalid";
           $errors_present = true;
