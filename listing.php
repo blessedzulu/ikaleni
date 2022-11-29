@@ -279,10 +279,10 @@
             }
 
             if ($count_user_bookings == 0 && $vacancies > 0) {
-              update_vacancies("decrease", $listing_id);
               $result_booking = create_booking($user_id, $listing_id);
 
               if ($result_booking) {
+                update_vacancies("decrease", $listing_id);
                 $_SESSION['status'] = 'create-booking-success';
                 header('Location: ./listing.php?listing-id=' . $listing_id);
                 ob_end_flush();

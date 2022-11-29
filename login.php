@@ -1,3 +1,5 @@
+<?php ob_start() ?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -23,7 +25,7 @@
     }
 
     if ($_SESSION['status'] == 'create-account-success') {
-      render_alert('success', 'Account created successfully', 'Log into your new account to continue.');
+      render_alert('success', 'Account created successfully', 'Continue to your account by ', './login.php', 'logging in.');
     }
 
     unset($_SESSION['status']);
@@ -49,8 +51,8 @@
 
       if (isset($_GET['log-in'])) {
         if (isset($_GET['email']) && isset($_GET['password'])) {
-          $email = $_GET['email'];
-          $password = $_GET['password'];
+          $email = sanitise_input($_GET['email']);
+          $password = sanitise_input($_GET['password']);
 
           $result_user = get_user_by_email($email);
           $count = mysqli_num_rows($result_user);
@@ -92,7 +94,7 @@
       ?>
 
       <form class="card card-md" action="<?= htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="get">
-        <div class="card-body">
+        <div class="card-body bg-white">
           <h2 class="h5 text-center mb-4">Login to your account</h2>
           <div class="mb-3">
             <label class="form-label required">Email</label>

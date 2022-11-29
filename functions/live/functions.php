@@ -1,10 +1,10 @@
 <?php
 // Connect to database
 function connect() {
-  $user = "root";
-  $password = "";
+  $user = "id19885043_localhost";
+  $password = "j|O*A6&{/+^OpsV}";
   $host = "localhost";
-  $db = "ikaleni";
+  $db = "id19885043_ikaleni";
 
   // Return connection
   if (!$connection = mysqli_connect($host, $user, $password, $db)) {

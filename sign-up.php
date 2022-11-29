@@ -49,6 +49,12 @@
         }
 
         // ? Validate user input
+        // ? Account type
+        if ($account_type != 'student' && $account_type != 'property-owner') {
+          $errors_present = true;
+          render_alert('danger', 'Invalid account type', 'Selected a valid account type and try again.');
+        }
+
         // ? First name
         // Is empty
         if (empty($first_name)) {
@@ -159,13 +165,13 @@
 
         // ? Show error alert 
         if ($errors_present) {
-          render_alert('danger', 'Sign up failed', 'Fix the errors try again');
+          render_alert('danger', 'Sign up failed', 'Fix the errors shown and try again');
         }
       }
       ?>
 
       <form class="card card-md" action="<?= htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post">
-        <div class="card-body">
+        <div class="card-body bg-white">
           <h2 class="h5 text-center mb-4">Sign Up For an Account</h2>
 
           <div class="mb-4 text-center">

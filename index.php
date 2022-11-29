@@ -1,3 +1,5 @@
+<?php ob_start() ?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -364,8 +366,8 @@
                     Log in or sign up to book a boarding house or list your property.
                   </p>
                   <div class="d-flex flex-column flex-lg-row justify-content-center align-items-center gap-2 gap-lg-3">
-                    <a href="./login.php" class="btn btn-primary">Sign Up</a>
-                    <a href="./sign-up.php" class="btn btn-light">Log In</a>
+                    <a href="./sign-up.php" class="btn btn-primary">Sign Up</a>
+                    <a href="./login.php" class="btn btn-light">Log In</a>
                   </div>
                 </div>
               </div>
