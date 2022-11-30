@@ -283,14 +283,12 @@
 
               if ($result_booking) {
                 update_vacancies("decrease", $listing_id);
-                $_SESSION['status'] = 'create-booking-success';
 
                 // ? Mail student
                 $student_first_name = $_SESSION['first_name'];
                 $student_last_name = $_SESSION['last_name'];
                 $student_email = $_SESSION['email'];
 
-                // the message
                 $student_msg = "Hello " . $student_first_name . ",\n";
                 $student_msg .= "\nYour booking at " . $name . " has been created successfully.\n";
                 $student_msg .= "\nContact the property owner to arrange for payment and booking approval to avoid losing your spot. Bookings that are not approved within 48 hours are automatically cancelled.\n";
@@ -298,7 +296,6 @@
                 $student_msg .= "\nDashboard: https://ikaleni.000webhostapp.com/student/\n";
                 $student_msg .= "\nProperty owner phone: +260 " . $owner_phone_number;
 
-                $student_msg = wordwrap($student_msg, 70);
                 mail($student_email, "Booking Confirmation", $student_msg);
 
                 // ? Mail property owner
@@ -308,9 +305,10 @@
                 $owner_msg .= "\nUse the link below to go to your dashboard to view and manage bookings.\n";
                 $owner_msg .= "\nDashboard: https://ikaleni.000webhostapp.com/property-owner/";
 
-                $owner_msg = wordwrap($owner_msg, 70);
                 mail($owner_email, "New Booking - " . $name, $owner_msg);
 
+                // ? Redirect
+                $_SESSION['status'] = 'create-booking-success';
                 header('Location: ./listing.php?listing-id=' . $listing_id);
                 ob_end_flush();
               }

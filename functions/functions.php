@@ -170,6 +170,12 @@ function get_all_bookings_by_status($status) {
   return query_db($conn, $query);
 }
 
+function get_bookings_by_time($duration_ago, $interval) {
+  $conn = connect();
+  $query = "SELECT * FROM bookings WHERE date_created < DATE_SUB(NOW(), INTERVAL $duration_ago $interval ) AND status = 'Pending'";
+  return query_db($conn, $query);
+}
+
 function get_booking($booking_id) {
   $conn = connect();
   $query = "SELECT * FROM bookings WHERE id = $booking_id";

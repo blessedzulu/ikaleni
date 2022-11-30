@@ -139,6 +139,7 @@
                 $row_tenant = mysqli_fetch_assoc($result_tenant);
                 $tenant_first_name = $row_tenant['first_name'];
                 $tenant_last_name = $row_tenant['last_name'];
+                $tenant_email = $row_tenant['email'];
                 $tenant_initials = substr($tenant_first_name, 0, 1) . substr($tenant_last_name, 0, 1);
                 $tenant_phone_number = $row_tenant['phone_number'];
 
@@ -154,6 +155,9 @@
                 $owner_id = $row_listing['owner_id'];
                 $result_owner = get_user_by_id($owner_id);
                 $row_owner = mysqli_fetch_assoc($result_owner);
+                $owner_first_name = $row_owner['first_name'];
+                $owner_last_name = $row_owner['last_name'];
+                $owner_email = $row_owner['email'];
                 $owner_phone_number = $row_owner['phone_number'];
 
                 // Booking Details
@@ -253,6 +257,22 @@
       $result_approve_booking = approve_booking($booking_id);
 
       if ($result_approve_booking) {
+        // ? Mail tenant
+        $tenant_msg = "Hello " . $tenant_first_name . ",\n";
+        $tenant_msg .= "\nYour booking at " . $listing_name . " has been approved by the property owner. Go to your dashboard to see your booking.\n";
+        $tenant_msg .= "\nWebsite: https://ikaleni.000webhostapp.com/student/";
+
+        mail($tenant_email, "Booking Approved", $tenant_msg);
+
+        // ? Mail property owner
+        $owner_msg = "Hello " . $owner_first_name . ",\n";
+        $owner_msg .= "You have approved " . $tenant_first_name . " " . $tenant_last_name . "'s booking at your property - " . $listing_name . "\n";
+        $owner_msg .= "\nGo to your dashboard to view and manage other bookings.\n";
+        $owner_msg .= "\nDashboard: https://ikaleni.000webhostapp.com/property-owner/";
+
+        mail($owner_email, "Booking Approval Confirmation - " . $name, $owner_msg);
+
+        // ? Redirect
         $_SESSION['status'] = 'approve-booking-success';
         header('Location: ./view-bookings.php?listing-id=' . $listing_id);
         ob_end_flush();
@@ -283,12 +303,43 @@
 
         if (isset($_GET['cancel-booking'])) {
           $_SESSION['status'] = 'cancel-booking-success';
+
+          // ? Mail tenant
+          $tenant_msg = "Hello " . $tenant_first_name . ",\n";
+          $tenant_msg .= "\nYour booking at " . $listing_name . " was cancelled by the property owner. Visit Ikaleni to find accommodation and to make another booking.\n";
+          $tenant_msg .= "\nWebsite: https://ikaleni.000webhostapp.com/";
+
+          mail($tenant_email, "Booking Cancelled", $tenant_msg);
+
+          // ? Mail property owner
+          $owner_msg = "Hello " . $owner_first_name . ",\n";
+          $owner_msg .= "You have cancelled " . $owner_first_name . " " . $owner_last_name . "'s booking at your property - " . $listing_name . "\n";
+          $owner_msg .= "\nGo to your dashboard to view and manage other bookings.\n";
+          $owner_msg .= "\nDashboard: https://ikaleni.000webhostapp.com/property-owner/";
+
+          mail($owner_email, "Booking Cancellation Confirmation - " . $listing_name, $owner_msg);
         }
 
         if (isset($_GET['decline-booking'])) {
           $_SESSION['status'] = 'decline-booking-success';
+
+          // ? Mail tenant
+          $tenant_msg = "Hello " . $tenant_first_name . ",\n";
+          $tenant_msg .= "\nYour booking at " . $listing_name . " was declined. Visit Ikaleni to find accommodation and to make another booking.\n";
+          $tenant_msg .= "\nWebsite: https://ikaleni.000webhostapp.com/";
+
+          mail($tenant_email, "Booking Declined", $tenant_msg);
+
+          // ? Mail property owner
+          $owner_msg = "Hello " . $owner_first_name . ",\n";
+          $owner_msg .= "You have declined " . $tenant_first_name . " " . $tenant_last_name . "'s booking at your property - " . $listing_name . "\n";
+          $owner_msg .= "\nGo to your dashboard to view and manage other bookings.\n";
+          $owner_msg .= "\nDashboard: https://ikaleni.000webhostapp.com/property-owner/";
+
+          mail($owner_email, "Booking Declination Confirmation - " . $listing_name, $owner_msg);
         }
 
+        // ? Redirect
         header('Location: ./view-bookings.php?listing-id=' . $listing_id);
         ob_end_flush();
       }

@@ -5,6 +5,7 @@ if ($level == 2) $url_prefix = '../';
 
 include($url_prefix . 'globals/variables.php');
 include($url_prefix . 'functions/functions.php');
+// include($url_prefix . 'includes/init.php');
 session_start();
 ?>
 

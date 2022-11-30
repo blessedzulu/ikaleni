@@ -13,6 +13,18 @@
 </head>
 
 <body class="border-top-wide border-primary d-flex flex-column">
+  <?php
+  // ? Status Alerts
+  if (isset($_SESSION['status'])) {
+
+    if ($_SESSION['status'] == 'cancel-booking-success') {
+      render_alert('success', 'Booking cancelled', 'You cancelled your booking. ', '../index.php', 'Make a new booking.');
+    }
+
+    unset($_SESSION['status']);
+  }
+  ?>
+
   <header class="navbar navbar-expand-md navbar-light">
     <?php include("../includes/navigation.php") ?>
   </header>
@@ -38,7 +50,6 @@
                   </svg>
                   Find Accommodation
                 </a>
-
               </div>
             </div>
           </div>
@@ -89,6 +100,7 @@
               $row_tenant = mysqli_fetch_assoc($result_tenant);
               $tenant_first_name = $row_tenant['first_name'];
               $tenant_last_name = $row_tenant['last_name'];
+              $tenant_email = $row_tenant['email'];
 
               // ? Fetch and store boarding house details
               $listing_id = $row_bookings['boarding_house_id'];
@@ -102,7 +114,10 @@
               $owner_id = $row_listing['owner_id'];
               $result_owner = get_user_by_id($owner_id);
               $row_owner = mysqli_fetch_assoc($result_owner);
+              $owner_first_name = $row_owner['first_name'];
+              $owner_last_name = $row_owner['last_name'];
               $owner_phone_number = $row_owner['phone_number'];
+              $owner_email = $row_owner['email'];
 
               // ? Booking Details
               $booking_id = $row_bookings['id'];
@@ -204,14 +219,28 @@
 
       if (!empty($result_delete_booking)) {
         $result_update_vacancies = update_vacancies("increase", $listing_id);
-        header('Location: ./?cancel-booking-status=success');
+
+        // ? Mail tenant
+        $tenant_msg = "Hello " . $tenant_first_name . ",\n";
+        $tenant_msg .= "\nYour booking at " . $listing_name . " has been cancelled successfully. Visit Ikaleni to find accommodation and to make another booking.\n";
+        $tenant_msg .= "\nWebsite: https://ikaleni.000webhostapp.com/";
+
+        mail($tenant_email, "Booking Cancellation Confirmation", $tenant_msg);
+
+        // ? Mail property owner
+        $owner_msg = "Hello " . $owner_first_name . ",\n";
+        $owner_msg .= $tenant_first_name . " " . $tenant_last_name . "\n has cancelled their booking at your property - " . $listing_name . " The vacancy is now available for another tenant to book.\n";
+        $owner_msg .= "\nGo to your dashboard to view and manage other bookings.\n";
+        $owner_msg .= "\nDashboard: https://ikaleni.000webhostapp.com/property-owner/";
+
+        mail($owner_email, "Booking Cancelled - " . $listing_name, $owner_msg);
+
+        // ? Redirect
+        $_SESSION['status'] = 'cancel-booking-success';
+        header('Location: ./');
         ob_end_flush();
       }
     };
-  }
-
-  if (isset($_GET['cancel-booking-status']) == "success") {
-    render_alert('success', 'Booking cancelled', 'You cancelled your booking. ', '../index.php', 'Make a new booking.');
   }
   ?>
 
